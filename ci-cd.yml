@@ -1,0 +1,45 @@
+name: .NET Core CI/CD
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '8.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore ./Prolog.Api/Prolog.Api.csproj
+      
+    - name: Build
+      run: dotnet build ./Prolog.Api/Prolog.Api.csproj --no-restore -c Release
+      
+    - name: Publish
+      run: dotnet publish ./Prolog.Api/Prolog.Api.csproj -c Release -o ./publish
+      
+    - name: Build Docker image
+      run: docker build -t v4dikos/prolog:latest -f ./Prolog.Api/Dockerfile .
+      
+    - name: Log in to DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+        
+    - name: Push Docker image to DockerHub
+      run: docker push v4dikos/prolog_api:latest
+      
+    - name: Deploy to Production
+      run: echo "Add your deployment script here"
+      env:
+        AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        DOTNET_ROOT: /opt/hostedtoolcache/dotnet

@@ -9,6 +9,13 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Prolog.Api/Prolog.Api.csproj", "Prolog.Api/"]
+COPY ["Prolog.Abstractions/Prolog.Abstractions.csproj", "Prolog.Abstractions/"]
+COPY ["Prolog.Core/Prolog.Core.csproj", "Prolog.Core/"]
+COPY ["Prolog.Domain/Prolog.Domain.csproj", "Prolog.Domain/"]
+COPY ["Prolog.Application/Prolog.Application.csproj", "Prolog.Application/"]
+COPY ["Prolog.Infrastructure/Prolog.Infrastructure.csproj", "Prolog.Infrastructure/"]
+COPY ["Prolog.Keycloak/Prolog.Keycloak.csproj", "Prolog.Keycloak/"]
+COPY ["Prolog.Services/Prolog.Services.csproj", "Prolog.Services/"]
 RUN dotnet restore "./Prolog.Api/./Prolog.Api.csproj"
 COPY . .
 WORKDIR "/src/Prolog.Api"
