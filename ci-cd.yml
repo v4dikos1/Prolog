@@ -36,10 +36,16 @@ jobs:
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
         
     - name: Push Docker image to DockerHub
-      run: docker push v4dikos/prolog_api:latest
+      run: docker push v4dikos/prolog:latest
       
-    - name: Deploy to Production
-      run: echo "Add your deployment script here"
-      env:
-        AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        DOTNET_ROOT: /opt/hostedtoolcache/dotnet
+    - name: Deploy to VPS
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.DEPLOY_SERVER }}
+        username: ${{ secrets.DEPLOY_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+            cd /prolog
+            docker-compose pull
+            docker-compose down
+            docker-compose up -d
