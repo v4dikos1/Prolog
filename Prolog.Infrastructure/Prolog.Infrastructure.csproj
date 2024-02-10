@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Prolog.Abstractions\Prolog.Abstractions.csproj" />
+    <ProjectReference Include="..\Prolog.Core\Prolog.Core.csproj" />
     <ProjectReference Include="..\Prolog.Domain\Prolog.Domain.csproj" />
     <ProjectReference Include="..\Prolog.Keycloak\Prolog.Keycloak.csproj" />
   </ItemGroup>
