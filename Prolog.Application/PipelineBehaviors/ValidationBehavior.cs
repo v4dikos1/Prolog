@@ -15,8 +15,12 @@ public class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TReq
             .SelectMany(result => result.Errors)
             .Where(f => f != null)
             .ToList();
-        return failures.Count != 0
-            ? throw new ValidationException(failures.Select(x => x.ErrorMessage).First())
-            : next();
+
+        if (failures.Count != 0)
+        {
+            throw new ValidationException(failures.Select(x => x.ErrorMessage).First());
+        }
+
+        return next();
     }
 }

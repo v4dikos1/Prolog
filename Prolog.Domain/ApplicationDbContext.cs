@@ -8,6 +8,7 @@ namespace Prolog.Domain;
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {
     public DbSet<ActionLog> ActionLogs { get; set; } = null!;
+    public DbSet<ExternalSystem> ExternalSystems { get; set; } = null!;
 
     public override int SaveChanges()
     {
@@ -55,5 +56,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).GetTypeInfo().Assembly);
+    }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseSnakeCaseNamingConvention();
     }
 }

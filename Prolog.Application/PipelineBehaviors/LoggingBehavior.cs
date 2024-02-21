@@ -1,22 +1,24 @@
 ﻿using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Prolog.Abstractions.CommonModels;
+using Prolog.Core.Loggers;
+using Prolog.Core.Loggers.Helpers;
 using Prolog.Domain;
 using Prolog.Domain.Entities;
 using System.ComponentModel;
-using System.Text.Encodings.Web;
+using System.Reflection;
 using System.Text.Json;
 
 namespace Prolog.Application.PipelineBehaviors;
 
-public class LoggingBehaviour<TRequest, TResponse> : IDisposable, IPipelineBehavior<TRequest, TResponse>
-    where TRequest : ILoggableAction
+public class LoggingBehavior<TRequest, TResponse> : IDisposable, IPipelineBehavior<TRequest, TResponse>
+    where TRequest : ActionLogger
 {
     private readonly ICurrentHttpContextAccessor _currentHttpContextAccessor;
     private readonly ApplicationDbContext _dbContext;
     private readonly IServiceScope _scope;
 
-    public LoggingBehaviour(IServiceProvider serviceProvider, ICurrentHttpContextAccessor currentHttpContextAccessor)
+    public LoggingBehavior(IServiceProvider serviceProvider, ICurrentHttpContextAccessor currentHttpContextAccessor)
     {
         _currentHttpContextAccessor = currentHttpContextAccessor;
         _scope = serviceProvider.CreateScope();
@@ -34,38 +36,23 @@ public class LoggingBehaviour<TRequest, TResponse> : IDisposable, IPipelineBehav
         CancellationToken cancellationToken)
     {
         var requestType = typeof(TRequest);
-        var options = new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
         try
         {
-            if (_currentHttpContextAccessor.MethodName == "GET")
-            {
-                return await next();
-            }
-            var newUserAction = new ActionLog
-            {
-                ActionName = requestType.Name,
-                ActionDateTime = DateTime.UtcNow,
-                IdentityUserId = _currentHttpContextAccessor.IdentityUserId,
-                UserName = _currentHttpContextAccessor.UserName ?? "",
-                UserSurname = _currentHttpContextAccessor.UserSurname ?? "",
-                RequestInfo = JsonSerializer.Serialize(request, options)
-            };
-            if (request is IEntityLoggableAction action)
-            {
-                newUserAction.EntityId = action.GetEntityId();
-            }
-            var attributes = requestType.GetCustomAttributes(typeof(DescriptionAttribute), true);
-            if (attributes.Length != 0)
-            {
-                var description = (DescriptionAttribute)attributes[0];
-                var text = description.Description;
-                newUserAction.Description = text;
-            }
-
             var response = await next();
 
-            await _dbContext.ActionLogs.AddAsync(newUserAction, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            if (request is ActionLogger loggableRequest)
+            {
+                var actionName = requestType.Name;
+                var descriptionAttribute = requestType.GetCustomAttribute(typeof(DescriptionAttribute), true);
+                var description = string.Empty;
+                if (descriptionAttribute != null)
+                {
+                    description = ((DescriptionAttribute)descriptionAttribute).Description;
+                }
+
+                await LogData(loggableRequest, description, actionName, cancellationToken);
+                await _dbContext.SaveChangesAsync(cancellationToken);
+            }
 
             return response;
         }
@@ -74,5 +61,39 @@ public class LoggingBehaviour<TRequest, TResponse> : IDisposable, IPipelineBehav
             Dispose();
             throw;
         }
+    }
+
+    private async Task LogData(ActionLogger loggableRequest, string requestDescription, string actionName, CancellationToken cancellationToken)
+    {
+        var commonUserAction = GetCurrentActionLog(actionName, requestDescription);
+
+        // Данные из свойств, помеченных атрибутом [LoggableProperty]
+        var loggableProperties = LoggablePropertyHelper.ExtractLoggableProperties(loggableRequest);
+        var logData = loggableProperties.ToDictionary(p => p.PropertyName, p => p.PropertyValue);
+
+        // Данные из обработчика запроса, которые также необходимо залогировать
+        var additionalData = loggableRequest.GetLogData();
+
+        // Данные, записываемые в процессе выполения запроса имеют приоритет над данными,
+        // записываемыми перед выполнением запроса, если поля имеют одинаковые имена
+        additionalData.ToList().ForEach(x => logData[x.Key] = x.Value);
+
+        var serializedCommonData = JsonSerializer.Serialize(logData);
+        commonUserAction.Filter = JsonDocument.Parse(serializedCommonData);
+
+        await _dbContext.ActionLogs.AddAsync(commonUserAction, cancellationToken);
+    }
+
+    private ActionLog GetCurrentActionLog(string actionName, string requestDescription)
+    {
+        return new ActionLog
+        {
+            ActionName = actionName,
+            ActionDateTime = DateTime.UtcNow,
+            IdentityUserId = _currentHttpContextAccessor.IdentityUserId,
+            UserName = _currentHttpContextAccessor.UserName ?? string.Empty,
+            UserSurname = _currentHttpContextAccessor.UserSurname ?? string.Empty,
+            Description = requestDescription
+        };
     }
 }
