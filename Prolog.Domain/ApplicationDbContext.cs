@@ -9,6 +9,14 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public DbSet<ActionLog> ActionLogs { get; set; } = null!;
     public DbSet<ExternalSystem> ExternalSystems { get; set; } = null!;
+    public DbSet<Driver> Drivers { get; set; } = null!;
+    public DbSet<Transport> Transports { get; set; } = null!;
+    public DbSet<Product> Products { get; set; } = null!;
+    public DbSet<Storage> Storages { get; set; } = null!;
+    public DbSet<Customer> Customers { get; set; } = null!;
+    public DbSet<Order> Orders { get; set; } = null!;
+    public DbSet<ProductItem> ProductItems { get; set; } = null!;
+    public DbSet<OrderItem> OrderItems { get; set; } = null!;
 
     public override int SaveChanges()
     {

@@ -4,9 +4,9 @@ using Prolog.Domain.Enums;
 namespace Prolog.Domain.Entities;
 
 /// <summary>
-/// Доставщик
+/// Транспорт
 /// </summary>
-public class Driver: BaseEntity<Guid>, IHasArchiveAttribute, IHasTrackDateAttribute
+public class Transport: BaseEntity<Guid>, IHasArchiveAttribute, IHasTrackDateAttribute
 {
     /// <summary>
     /// Идентификатор внешней системы
@@ -19,34 +19,29 @@ public class Driver: BaseEntity<Guid>, IHasArchiveAttribute, IHasTrackDateAttrib
     public ExternalSystem ExternalSystem { get; set; } = null!;
 
     /// <summary>
-    /// Наименование
+    /// Тип
     /// </summary>
-    public required string Name { get; set; }
+    public TransportTypeEnum Type { get; set; }
 
     /// <summary>
-    /// Фамилия
+    /// Объем
     /// </summary>
-    public required string Surname { get; set; }
+    public decimal Volume { get; set; }
 
     /// <summary>
-    /// Отчество
+    /// Грузоподъемность
     /// </summary>
-    public required string Patronymic { get; set; }
+    public decimal Capacity { get; set; }
 
     /// <summary>
-    /// Номер телефона
+    /// Расход толплива на 1 км
     /// </summary>
-    public required string PhoneNumber { get; set; }
+    public decimal FuelConsumption { get; set; }
 
     /// <summary>
-    /// Почта
+    /// Номерной знак
     /// </summary>
-    public required string Email { get; set; }
-
-    /// <summary>
-    /// Тип управляемых автомобилей
-    /// </summary>
-    public DriverTypeEnum Type { get; set; }
+    public required string LicencePlate { get; set; }
 
     public bool IsArchive { get; set; }
     public DateTimeOffset DateModified { get; set; }

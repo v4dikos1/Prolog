@@ -1,12 +1,11 @@
 ﻿using Prolog.Domain.Abstractions;
-using Prolog.Domain.Enums;
 
 namespace Prolog.Domain.Entities;
 
 /// <summary>
-/// Доставщик
+/// Клиент
 /// </summary>
-public class Driver: BaseEntity<Guid>, IHasArchiveAttribute, IHasTrackDateAttribute
+public class Customer: BaseEntity<Guid>, IHasArchiveAttribute, IHasTrackDateAttribute
 {
     /// <summary>
     /// Идентификатор внешней системы
@@ -42,11 +41,6 @@ public class Driver: BaseEntity<Guid>, IHasArchiveAttribute, IHasTrackDateAttrib
     /// Почта
     /// </summary>
     public required string Email { get; set; }
-
-    /// <summary>
-    /// Тип управляемых автомобилей
-    /// </summary>
-    public DriverTypeEnum Type { get; set; }
 
     public bool IsArchive { get; set; }
     public DateTimeOffset DateModified { get; set; }

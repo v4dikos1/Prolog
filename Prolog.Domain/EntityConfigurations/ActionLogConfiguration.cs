@@ -8,7 +8,7 @@ internal class ActionLogConfiguration : IEntityTypeConfiguration<ActionLog>
 {
     public void Configure(EntityTypeBuilder<ActionLog> builder)
     {
-        builder.ToTable("action_logs");
+        builder.ToTable("action_log");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).IsRequired();
 
