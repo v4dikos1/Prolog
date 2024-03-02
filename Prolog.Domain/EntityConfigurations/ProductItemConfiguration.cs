@@ -18,7 +18,7 @@ internal class ProductItemConfiguration: IEntityTypeConfiguration<ProductItem>
             .HasForeignKey(x => x.ProductId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Property(x => x.OrderItem).IsRequired(false);
+        builder.Property(x => x.OrderItemId).IsRequired(false);
         builder.HasOne(x => x.OrderItem)
             .WithOne()
             .HasForeignKey<ProductItem>(x => x.OrderItemId)

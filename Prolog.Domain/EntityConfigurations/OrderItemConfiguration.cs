@@ -8,7 +8,7 @@ internal class OrderItemConfiguration: IEntityTypeConfiguration<OrderItem>
 {
     public void Configure(EntityTypeBuilder<OrderItem> builder)
     {
-        builder.ToTable("product_item");
+        builder.ToTable("order_item");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).IsRequired();
 
