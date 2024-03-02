@@ -8,7 +8,7 @@ internal class ActionLogConfiguration : IEntityTypeConfiguration<ActionLog>
 {
     public void Configure(EntityTypeBuilder<ActionLog> builder)
     {
-        builder.ToTable("action_logs");
+        builder.ToTable("action_log");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).IsRequired();
 
@@ -17,8 +17,9 @@ internal class ActionLogConfiguration : IEntityTypeConfiguration<ActionLog>
         builder.Property(x => x.ActionName).IsRequired();
         builder.Property(x => x.Description).IsRequired();
         builder.Property(x => x.ActionDateTime).IsRequired();
-        builder.Property(x => x.RequestInfo).IsRequired();
         builder.Property(x => x.IdentityUserId).IsRequired(false);
+
+        builder.Property(x => x.Filter).IsRequired();
 
         builder.Property(x => x.DateCreated).IsRequired();
         builder.Property(x => x.DateModified).IsRequired();

@@ -2,6 +2,8 @@
 using Microsoft.OpenApi.Models;
 using Prolog.Api.StartupConfigurations.Models;
 using Prolog.Keycloak.Models;
+using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace Prolog.Api.StartupConfigurations.Swagger;
 public static class ConfigureSwaggerExtension
@@ -17,9 +19,17 @@ public static class ConfigureSwaggerExtension
             c.SwaggerDoc("admin", new OpenApiInfo { Title = "Prolog.Admin.Api", Version = "v1" });
 
             c.OperationFilter<CustomSwaggerOperationAttribute>();
-            var xmlFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.xml", SearchOption.TopDirectoryOnly)
-                .ToList();
-            xmlFiles.ForEach(xmlFile => c.IncludeXmlComments(xmlFile));
+            c.SupportNonNullableReferenceTypes();
+            Directory
+                .GetFiles(AppContext.BaseDirectory, "*.xml", SearchOption.TopDirectoryOnly)
+                .ToList()
+                .ForEach(xmlFile =>
+                {
+                    var doc = XDocument.Load(xmlFile);
+                    c.IncludeXmlComments(() => new XPathDocument(doc.CreateReader()), includeControllerXmlComments: true);
+                    c.SchemaFilter<SwaggerRequiredSchemaFilter>();
+                    c.SchemaFilter<SwaggerRequiredAttributeSchemaFilter>();
+                });
 
             var authUrl = new Uri(configuration.BaseUrl + $"/realms/{configuration.Realm}/protocol/openid-connect/auth");
             var tokenUrl = new Uri(configuration.BaseUrl + $"/realms/{configuration.Realm}/protocol/openid-connect/token");

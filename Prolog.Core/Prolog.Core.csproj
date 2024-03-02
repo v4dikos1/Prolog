@@ -14,9 +14,9 @@
   	<PackageReference Include="Ardalis.GuardClauses" Version="4.4.0" />
   	<PackageReference Include="IdentityModel" Version="6.2.0" />
   	<PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
-  	<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.1" />
-  	<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.1" />
-  	<PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="8.0.1" />
+  	<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.2" />
+  	<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.2" />
+  	<PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="8.0.2" />
   </ItemGroup>
 
 </Project>
