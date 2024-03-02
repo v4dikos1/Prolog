@@ -16,7 +16,7 @@ public static class ConfigureSwaggerExtension
 
         services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("admin", new OpenApiInfo { Title = "Prolog.Admin.Api", Version = "v1" });
+            c.SwaggerDoc("admin", new OpenApiInfo { Title = "Prolog.Admin.API", Version = "v1" });
 
             c.OperationFilter<CustomSwaggerOperationAttribute>();
             c.SupportNonNullableReferenceTypes();
@@ -46,7 +46,7 @@ public static class ConfigureSwaggerExtension
                             TokenUrl = tokenUrl,
                             Scopes = new Dictionary<string, string>
                             {
-                                { scopesConfiguration.AdminScopeName, "Prolog.Admin.Api" },
+                                { scopesConfiguration.AdminScopeName, "Prolog.Admin.API" },
                                 { "openid", "Identifier" },
                                 { "roles", "Roles User" },
                                 { "profile", "Profile identity user" },
@@ -68,7 +68,7 @@ public static class ConfigureSwaggerExtension
         app.UseSwagger();
         app.UseSwaggerUI(c =>
         {
-            c.SwaggerEndpoint("/swagger/admin/swagger.json", "Prolog.Admin.Api");
+            c.SwaggerEndpoint("/swagger/admin/swagger.json", "Prolog.Admin.API");
             c.OAuthAppName("Swagger Client");
             c.OAuthUsePkce();
         });

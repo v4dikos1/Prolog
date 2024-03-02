@@ -18,6 +18,11 @@ public class Product: BaseEntity<Guid>, IHasArchiveAttribute, IHasTrackDateAttri
     public ExternalSystem ExternalSystem { get; set; } = null!;
 
     /// <summary>
+    /// Код в системе партнера
+    /// </summary>
+    public required string Code { get; set; }
+
+    /// <summary>
     /// Наименование
     /// </summary>
     public required string Name { get; set; }
@@ -26,6 +31,11 @@ public class Product: BaseEntity<Guid>, IHasArchiveAttribute, IHasTrackDateAttri
     /// Вес
     /// </summary>
     public required decimal Weight { get; set; }
+
+    /// <summary>
+    /// Объем
+    /// </summary>
+    public decimal Volume { get; set; }
 
     /// <summary>
     /// Цена (в копейках)
