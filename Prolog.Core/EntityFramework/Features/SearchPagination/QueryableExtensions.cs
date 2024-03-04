@@ -1,5 +1,4 @@
 ﻿using Ardalis.GuardClauses;
-using CoreLib.EntityFramework.Features.SearchPagination;
 using Microsoft.EntityFrameworkCore;
 using Prolog.Core.EntityFramework.Features.SearchPagination.Interfaces;
 using Prolog.Core.EntityFramework.Features.SearchPagination.Models;

@@ -1,4 +1,4 @@
-﻿namespace CoreLib.EntityFramework.Features.SearchPagination;
+﻿namespace Prolog.Core.EntityFramework.Features.SearchPagination.Interfaces;
 
 public interface ISearchQuery
 {
