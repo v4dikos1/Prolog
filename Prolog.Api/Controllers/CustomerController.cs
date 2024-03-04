@@ -3,86 +3,87 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Prolog.Abstractions.CommonModels;
 using Prolog.Api.StartupConfigurations;
-using Prolog.Application.Storages.Commands;
-using Prolog.Application.Storages.Dtos;
-using Prolog.Application.Storages.Queries;
+using Prolog.Application.Clients.Commands;
+using Prolog.Application.Clients.Dtos;
+using Prolog.Application.Clients.Queries;
 using Prolog.Core.EntityFramework.Features.SearchPagination.Models;
 
 namespace Prolog.Api.Controllers;
 
-[Route("api/admin/storages")]
+[Route("api/admin/customers")]
 [ApiExplorerSettings(GroupName = "admin")]
 [Authorize(Policy = KeycloakAuthConfiguration.AdminApiPolicy)]
-public class StorageController(ISender sender): BaseController
+public class CustomerController(ISender sender): BaseController
 {
     /// <summary>
-    /// Добавление склада
+    /// Добавление клиента
     /// </summary>
     /// <param name="command">Модель запроса</param>
     /// <param name="cancellationToken">Токен отмены</param>
-    /// <returns>Идентификатор созданного склада</returns>
+    /// <returns>Идентификатор клиента</returns>
     [HttpPost]
-    public async Task<CreatedOrUpdatedEntityViewModel<Guid>> CreateStorage([FromQuery] CreateStorageCommand command,
+    public async Task<CreatedOrUpdatedEntityViewModel<Guid>> CreateCustomer([FromQuery] CreateCustomerCommand command,
         CancellationToken cancellationToken)
     {
         return await sender.Send(command, cancellationToken);
     }
 
     /// <summary>
-    /// Получение списка складов
+    /// Получение списка клиентов
     /// </summary>
     /// <param name="query">Модель запроса</param>
     /// <param name="cancellationToken">Токен отмены</param>
-    /// <returns>Список складов</returns>
+    /// <returns>Список клиентов</returns>
     [HttpGet]
-    public async Task<PagedResult<StorageListViewModel>> GetStoragesList([FromQuery] GetStoragesListQuery query,
-        CancellationToken cancellationToken)
+    public async Task<PagedResult<CustomerListViewModel>> GetCustomersListQuery(
+        [FromQuery] GetCustomersLListQuery query, CancellationToken cancellationToken)
     {
         return await sender.Send(query, cancellationToken);
     }
 
+
     /// <summary>
-    /// Получние конкртеного склада
+    /// Получение конкретного клиента
     /// </summary>
     /// <param name="query">Модель запроса</param>
     /// <param name="cancellationToken">Токен отмены</param>
-    /// <returns>Модель конкретного склада</returns>
-    [HttpGet("{StorageId}")]
-    public async Task<StorageViewModel> GetStorage([FromQuery] GetStorageQuery query,
+    /// <returns>Модель клиента</returns>
+    [HttpGet("{CustomerId}")]
+    public async Task<CustomerViewModel> GetCustomer([FromQuery] GetCustomerQuery query,
         CancellationToken cancellationToken)
     {
         return await sender.Send(query, cancellationToken);
     }
 
     /// <summary>
-    /// Архивирование склада
+    /// Архивация клиента
     /// </summary>
     /// <param name="command">Модель запроса</param>
     /// <param name="cancellationToken">Токен отмены</param>
-    [HttpDelete("{StorageId}")]
-    public async Task ArchiveStorage([FromQuery] ArchiveStorageCommand command, CancellationToken cancellationToken)
+    [HttpDelete("{CustomerId}")]
+    public async Task ArchiveCustomer([FromQuery] ArchiveCustomerCommand command, CancellationToken cancellationToken)
     {
         await sender.Send(command, cancellationToken);
     }
 
     /// <summary>
-    /// Архивирование складов
+    /// Архивация клиентов
     /// </summary>
     /// <param name="command">Модель запроса</param>
     /// <param name="cancellationToken">Токен отмены</param>
     [HttpDelete]
-    public async Task ArchiveStorages([FromQuery] ArchiveStoragesCommand command, CancellationToken cancellationToken)
+    public async Task ArchiveCustomers([FromQuery] ArchiveCustomersCommand command, CancellationToken cancellationToken)
     {
         await sender.Send(command, cancellationToken);
-    } 
+    }
 
     /// <summary>
-    /// Обновление информации о складе
+    /// Обновление информации о клиенте
     /// </summary>
     /// <param name="command">Модель запроса</param>
     /// <param name="cancellationToken">Токен отмены</param>
-    [HttpPut("{StorageId}")]
-    public async Task UpdateStorage([FromQuery] UpdateStorageCommand command, CancellationToken cancellationToken)
+    [HttpPut("{CustomerId}")]
+    public async Task UpdateCustomer([FromQuery] UpdateCustomerCommand command, CancellationToken cancellationToken)
     {
         await sender.Send(command, cancellationToken);
     }
