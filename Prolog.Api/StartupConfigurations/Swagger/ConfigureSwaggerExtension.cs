@@ -27,6 +27,7 @@ public static class ConfigureSwaggerExtension
                 {
                     var doc = XDocument.Load(xmlFile);
                     c.IncludeXmlComments(() => new XPathDocument(doc.CreateReader()), includeControllerXmlComments: true);
+                    c.SchemaFilter<DescribeEnumMembersSchemaFilter>(doc);
                     c.SchemaFilter<SwaggerRequiredSchemaFilter>();
                     c.SchemaFilter<SwaggerRequiredAttributeSchemaFilter>();
                 });
