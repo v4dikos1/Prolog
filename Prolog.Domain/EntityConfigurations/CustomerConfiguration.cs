@@ -13,9 +13,6 @@ internal class CustomerConfiguration: IEntityTypeConfiguration<Customer>
         builder.Property(x => x.Id).IsRequired();
 
         builder.Property(x => x.Name).IsRequired();
-        builder.Property(x => x.Surname).IsRequired();
-        builder.Property(x => x.Patronymic).IsRequired();
-        builder.Property(x => x.Email).IsRequired();
         builder.Property(x => x.PhoneNumber).IsRequired();
 
         builder.Property(x => x.ExternalSystemId).IsRequired();

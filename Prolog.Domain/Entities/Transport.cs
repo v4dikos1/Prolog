@@ -1,5 +1,4 @@
 ﻿using Prolog.Domain.Abstractions;
-using Prolog.Domain.Enums;
 
 namespace Prolog.Domain.Entities;
 
@@ -11,17 +10,12 @@ public class Transport: BaseEntity<Guid>, IHasArchiveAttribute, IHasTrackDateAtt
     /// <summary>
     /// Идентификатор внешней системы
     /// </summary>
-    public required Guid ExternalSystemId { get; set; }
+    public Guid ExternalSystemId { get; set; }
 
     /// <summary>
     /// Внешняя система
     /// </summary>
     public ExternalSystem ExternalSystem { get; set; } = null!;
-
-    /// <summary>
-    /// Тип
-    /// </summary>
-    public TransportTypeEnum Type { get; set; }
 
     /// <summary>
     /// Объем
@@ -41,7 +35,12 @@ public class Transport: BaseEntity<Guid>, IHasArchiveAttribute, IHasTrackDateAtt
     /// <summary>
     /// Номерной знак
     /// </summary>
-    public required string LicencePlate { get; set; }
+    public string LicencePlate { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Марка
+    /// </summary>
+    public string Brand { get; set; } = string.Empty;
 
     public bool IsArchive { get; set; }
     public DateTimeOffset DateModified { get; set; }

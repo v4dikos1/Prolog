@@ -15,9 +15,9 @@ internal class DriverConfiguration: IEntityTypeConfiguration<Driver>
         builder.Property(x => x.Name).IsRequired();
         builder.Property(x => x.Surname).IsRequired();
         builder.Property(x => x.Patronymic).IsRequired();
-        builder.Property(x => x.Email).IsRequired();
+        builder.Property(x => x.Telegram).IsRequired();
         builder.Property(x => x.PhoneNumber).IsRequired();
-        builder.Property(x => x.Type).IsRequired();
+        builder.Property(x => x.Salary).IsRequired();
 
         builder.Property(x => x.ExternalSystemId).IsRequired();
         builder.HasOne(x => x.ExternalSystem)
