@@ -11,12 +11,12 @@ public class UpdateProductModel
     public required decimal Price { get; set; }
 
     /// <summary>
-    /// Вес
+    /// Вес в кг
     /// </summary>
     public required decimal Weight { get; set; }
 
     /// <summary>
-    /// Объем
+    /// Объем в метрах кубических
     /// </summary>
     public required decimal Volume { get; set; }
 
@@ -24,15 +24,4 @@ public class UpdateProductModel
     /// Наименование
     /// </summary>
     public required string Name { get; set; }
-
-    // TODO: уточнить
-    /// <summary>
-    /// Идентификатор спец. транспорта
-    /// </summary>
-    public long? SpecialTransportId { get; set; }
-
-    /// <summary>
-    /// Описание
-    /// </summary>
-    public string? Description { get; set; }
 }

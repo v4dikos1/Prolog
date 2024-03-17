@@ -34,9 +34,4 @@ public class ProductListViewModel
     /// Цена
     /// </summary>
     public required decimal Price { get; set;}
-
-    /// <summary>
-    /// Доп. инфо
-    /// </summary>
-    public string? Description { get; set; }
 }

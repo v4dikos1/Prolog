@@ -56,17 +56,6 @@ public class CustomerController(ISender sender): BaseController
     }
 
     /// <summary>
-    /// Архивация клиента
-    /// </summary>
-    /// <param name="command">Модель запроса</param>
-    /// <param name="cancellationToken">Токен отмены</param>
-    [HttpDelete("{CustomerId}")]
-    public async Task ArchiveCustomer([FromQuery] ArchiveCustomerCommand command, CancellationToken cancellationToken)
-    {
-        await sender.Send(command, cancellationToken);
-    }
-
-    /// <summary>
     /// Архивация клиентов
     /// </summary>
     /// <param name="command">Модель запроса</param>
