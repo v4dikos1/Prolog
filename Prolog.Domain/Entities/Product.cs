@@ -10,7 +10,7 @@ public class Product: BaseEntity<Guid>, IHasArchiveAttribute, IHasTrackDateAttri
     /// <summary>
     /// Идентификатор внешней системы
     /// </summary>
-    public required Guid ExternalSystemId { get; set; }
+    public Guid ExternalSystemId { get; set; }
 
     /// <summary>
     /// Внешняя система
@@ -20,17 +20,17 @@ public class Product: BaseEntity<Guid>, IHasArchiveAttribute, IHasTrackDateAttri
     /// <summary>
     /// Код в системе партнера
     /// </summary>
-    public required string Code { get; set; }
+    public string Code { get; set; } = string.Empty;
 
     /// <summary>
     /// Наименование
     /// </summary>
-    public required string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
     /// Вес
     /// </summary>
-    public required decimal Weight { get; set; }
+    public decimal Weight { get; set; }
 
     /// <summary>
     /// Объем
@@ -40,12 +40,7 @@ public class Product: BaseEntity<Guid>, IHasArchiveAttribute, IHasTrackDateAttri
     /// <summary>
     /// Цена (в копейках)
     /// </summary>
-    public required long Price { get; set; }
-
-    /// <summary>
-    /// Описание
-    /// </summary>
-    public string? Description { get; set; }
+    public long Price { get; set; }
 
     public bool IsArchive { get; set; }
     public DateTimeOffset DateModified { get; set; }

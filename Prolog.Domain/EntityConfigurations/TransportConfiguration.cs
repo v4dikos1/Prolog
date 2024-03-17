@@ -16,7 +16,7 @@ internal class TransportConfiguration: IEntityTypeConfiguration<Transport>
         builder.Property(x => x.Capacity).IsRequired();
         builder.Property(x => x.FuelConsumption).IsRequired();
         builder.Property(x => x.LicencePlate).IsRequired();
-        builder.Property(x => x.Type).IsRequired();
+        builder.Property(x => x.Brand).IsRequired();
 
         builder.Property(x => x.ExternalSystemId).IsRequired();
         builder.HasOne(x => x.ExternalSystem)

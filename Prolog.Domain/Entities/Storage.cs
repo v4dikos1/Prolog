@@ -10,7 +10,7 @@ public class Storage: BaseEntity<Guid>, IHasArchiveAttribute, IHasTrackDateAttri
     /// <summary>
     /// Идентификатор внешней системы
     /// </summary>
-    public required Guid ExternalSystemId { get; set; }
+    public Guid ExternalSystemId { get; set; }
 
     /// <summary>
     /// Внешняя система
@@ -20,17 +20,17 @@ public class Storage: BaseEntity<Guid>, IHasArchiveAttribute, IHasTrackDateAttri
     /// <summary>
     /// Наименование
     /// </summary>
-    public required string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
     /// Адрес
     /// </summary>
-    public required string Address { get; set; }
+    public string Address { get; set; } = string.Empty;
 
     /// <summary>
     /// Координаты
     /// </summary>
-    public required string Coordinates { get; set; }
+    public string Coordinates { get; set; } = string.Empty;
 
     public bool IsArchive { get; set; }
     public DateTimeOffset DateModified { get; set; }
