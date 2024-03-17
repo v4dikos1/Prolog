@@ -22,9 +22,5 @@ internal class CreateCustomerCommandValidator: AbstractValidator<CreateCustomerC
         RuleFor(x => x.Body.PhoneNumber)
             .NotEmpty()
             .WithMessage("Номер телефона клиента является обязательным параметром!");
-
-        RuleFor(x => x.Body.Email)
-            .NotEmpty()
-            .WithMessage("Почта клиента является обязательным параметром!");
     }
 }

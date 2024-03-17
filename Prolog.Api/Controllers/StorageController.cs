@@ -55,17 +55,6 @@ public class StorageController(ISender sender): BaseController
     }
 
     /// <summary>
-    /// Архивирование склада
-    /// </summary>
-    /// <param name="command">Модель запроса</param>
-    /// <param name="cancellationToken">Токен отмены</param>
-    [HttpDelete("{StorageId}")]
-    public async Task ArchiveStorage([FromQuery] ArchiveStorageCommand command, CancellationToken cancellationToken)
-    {
-        await sender.Send(command, cancellationToken);
-    }
-
-    /// <summary>
     /// Архивирование складов
     /// </summary>
     /// <param name="command">Модель запроса</param>

@@ -14,9 +14,4 @@ public class CreateStorageModel
     /// Адрес
     /// </summary>
     public required string Address { get; set; }
-
-    /// <summary>
-    /// Является ли основным
-    /// </summary>
-    public bool IsPrimary { get; set; } 
 }
