@@ -27,9 +27,13 @@ internal class CreateOrderCommandValidator: AbstractValidator<CreateOrderCommand
             .NotEmpty()
             .WithMessage("Цена доставки является обязательным параметром!");
 
-        RuleFor(x => x.Body.PickUpDate)
+        RuleFor(x => x.Body.PickUpDateFrom)
             .NotEmpty()
-            .WithMessage("Дата забора является обязательным параметром!");
+            .WithMessage("Дата забора \"c\" является обязательным параметром!");
+        
+        RuleFor(x => x.Body.PickUpDateTo)
+            .NotEmpty()
+            .WithMessage("Дата забора \"до\" является обязательным параметром!");
 
         RuleFor(x => x.Body.ProductIds)
             .NotEmpty()

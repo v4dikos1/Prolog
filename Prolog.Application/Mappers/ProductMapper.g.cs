@@ -27,6 +27,7 @@ namespace Prolog.Application.Products
             }
             Product result = p3 ?? new Product();
             
+            result.Code = p2.Code;
             result.Name = p2.Name;
             result.Weight = p2.Weight;
             result.Volume = p2.Volume;

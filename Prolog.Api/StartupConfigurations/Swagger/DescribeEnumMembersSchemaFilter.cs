@@ -65,7 +65,6 @@ public class DescribeEnumMembersSchemaFilter : ISchemaFilter
 
         sb.AppendLine("<ul>");
 
-        // TODO: Handle flags better e.g. Hex formatting
         foreach (var name in Enum.GetValues(type))
         {
             // Allows for large enums

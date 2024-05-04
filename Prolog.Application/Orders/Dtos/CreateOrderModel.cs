@@ -16,14 +16,24 @@ public class CreateOrderModel
     public required string Address { get; set; }
 
     /// <summary>
-    /// Дата забора (Формат: dd-mm-yyyyThh:ss+(-)hh:mm. Например, 05-03-2024T12:00+07:00)
+    /// Дата забора "c" (Формат: dd-mm-yyyyThh:ss+(-)hh:mm. Например, 05-03-2024T12:00+07:00)
     /// </summary>
-    public required DateTimeOffset PickUpDate { get; set; }
+    public required DateTimeOffset PickUpDateFrom { get; set; }
+    
+    /// <summary>
+    /// Дата забора "до" (Формат: dd-mm-yyyyThh:ss+(-)hh:mm. Например, 05-03-2024T12:00+07:00)
+    /// </summary>
+    public required DateTimeOffset PickUpDateTo { get; set; }
 
     /// <summary>
-    /// Дата доставки (Формат: dd-mm-yyyyThh:ss+(-)hh:mm. Например, 05-03-2024T12:00+07:00)
+    /// Дата доставки "с" (Формат: dd-mm-yyyyThh:ss+(-)hh:mm. Например, 05-03-2024T12:00+07:00)
     /// </summary>
-    public DateTimeOffset? DeliveryDate { get; set; }
+    public DateTimeOffset? DeliveryDateFrom { get; set; }
+    
+    /// <summary>
+    /// Дата доставки "до" (Формат: dd-mm-yyyyThh:ss+(-)hh:mm. Например, 05-03-2024T12:00+07:00)
+    /// </summary>
+    public DateTimeOffset? DeliveryDateTo { get; set; }
 
     /// <summary>
     /// Идентификатор клиента
