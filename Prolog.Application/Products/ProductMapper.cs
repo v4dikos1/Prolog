@@ -30,6 +30,7 @@ internal class ProductMapRegister : IRegister
             .Map(d => d.Code, src => src.ExistedProduct.Code)
             .Map(d => d.ExternalSystemId, src => src.ExistedProduct.ExternalSystemId)
             .Map(d => d.Name, src => src.Model.Name)
+            .Map(d => d.Code, src => src.Model.Code)
             .Map(d => d.Price, src => src.Model.Price)
             .Map(d => d.Volume, src => src.Model.Volume)
             .Map(d => d.Weight, src => src.Model.Weight);

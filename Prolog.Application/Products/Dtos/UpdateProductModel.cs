@@ -24,4 +24,9 @@ public class UpdateProductModel
     /// Наименование
     /// </summary>
     public required string Name { get; set; }
+    
+    /// <summary>
+    /// Код товара
+    /// </summary>
+    public required string Code { get; set; }
 }

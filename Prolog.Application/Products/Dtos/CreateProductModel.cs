@@ -5,8 +5,4 @@
 /// </summary>
 public class CreateProductModel: UpdateProductModel
 {
-    /// <summary>
-    /// Код товара
-    /// </summary>
-    public required string Code { get; set; }
 }

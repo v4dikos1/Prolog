@@ -13,7 +13,7 @@ namespace Prolog.Application.Storages
             {
                 ExternalSystemId = p1.Item2,
                 Name = p1.Item1.Name,
-                Address = p1.Item1.Address.ToLower(),
+                Address = p1.Item1.Address,
                 Coordinates = string.Empty
             };
         }

@@ -18,13 +18,13 @@ public class StorageMapRegister : IRegister
     public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<(CreateStorageModel Model, Guid ExternalSystemId), Storage>()
-            .Map(d => d.Address, src => src.Model.Address.ToLower())
+            .Map(d => d.Address, src => src.Model.Address)
             .Map(d => d.Name, src => src.Model.Name)
             .Map(d => d.ExternalSystemId, src => src.ExternalSystemId)
             .Map(d => d.Coordinates, src => string.Empty);
 
         config.NewConfig<(CreateStorageModel Model, Storage Storage), Storage>()
-            .Map(d => d.Address, src => src.Model.Address.ToLower())
+            .Map(d => d.Address, src => src.Model.Address)
             .Map(d => d.Name, src => src.Model.Name)
             .Map(d => d.ExternalSystemId, src => src.Storage.ExternalSystemId)
             .Map(d => d.Coordinates, src => string.Empty);
