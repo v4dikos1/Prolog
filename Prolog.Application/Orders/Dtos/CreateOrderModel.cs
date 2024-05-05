@@ -48,5 +48,5 @@ public class CreateOrderModel
     /// <summary>
     /// Идентификаторы товаров
     /// </summary>
-    public required IEnumerable<long> ProductIds { get; set; }
+    public required IEnumerable<Guid> ProductIds { get; set; }
 }
