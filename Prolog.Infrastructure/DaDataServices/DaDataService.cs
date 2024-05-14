@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Prolog.Abstractions.CommonModels.DaDataService;
 using Prolog.Abstractions.CommonModels.DaDataService.Models.Query;
 using Prolog.Abstractions.CommonModels.DaDataService.Models.Response;
 using Prolog.Abstractions.Services;
@@ -24,5 +25,12 @@ public class DaDataService(IConfiguration configuration) : IDaDataService
         using var client = new DaDataHttpClient(_apiKey, _daDataServiceUrl);
         var suggestionList = await client.GetAddressByHouseFiasId(fiasHouseId);
         return suggestionList.Suggestions.FirstOrDefault()!;
+    }
+
+    public async Task<CoordinatesResponseModel> GetCoordinatesByAddress(string address)
+    {
+        using var client = new DaDataHttpClient(_apiKey, _daDataServiceUrl);
+        var coordinates = await client.GetCoordinatesByAddress(address);
+        return coordinates;
     }
 }

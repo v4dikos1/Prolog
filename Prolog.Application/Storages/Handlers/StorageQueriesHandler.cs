@@ -23,7 +23,7 @@ internal class StorageQueriesHandler(ApplicationDbContext dbContext, ICurrentHtt
             .Where(x => !x.IsArchive)
             .OrderBy(x => x.Name)
             .ThenBy(x => x.Address)
-            .ApplySearch(request, x => x.Name, x => x.Address, x => x.Name);
+            .ApplySearch(request, x => x.Name, x => x.Address.AddressFullName, x => x.Name);
 
         var storagesList = await storagesQuery
             .ApplyPagination(request)

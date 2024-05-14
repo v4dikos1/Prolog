@@ -1,4 +1,4 @@
-﻿namespace Prolog.Application.Addresses.Dtos;
+﻿namespace Prolog.Domain.Entities;
 
 public class Address
 {

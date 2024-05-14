@@ -6,7 +6,7 @@ namespace Prolog.Domain.Entities;
 /// <summary>
 /// Заявка
 /// </summary>
-public class Order: BaseEntity<Guid>, IHasArchiveAttribute, IHasTrackDateAttribute
+public class Order: BaseEntity<long>, IHasArchiveAttribute, IHasTrackDateAttribute
 {
     /// <summary>
     /// Идентификатор внешней системы
@@ -19,6 +19,21 @@ public class Order: BaseEntity<Guid>, IHasArchiveAttribute, IHasTrackDateAttribu
     public ExternalSystem ExternalSystem { get; set; } = null!;
 
     /// <summary>
+    /// Идентификатор склада
+    /// </summary>
+    public required Guid StorageId { get; set; }
+
+    /// <summary>
+    /// Склад
+    /// </summary>
+    public Storage Storage { get; set; } = null!;
+
+    /// <summary>
+    /// Состав заказа
+    /// </summary>
+    public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
+
+    /// <summary>
     /// Идентификатор клиента
     /// </summary>
     public required Guid CustomerId { get; set; }
@@ -28,50 +43,38 @@ public class Order: BaseEntity<Guid>, IHasArchiveAttribute, IHasTrackDateAttribu
     /// </summary>
     public Customer Customer { get; set; } = null!;
 
-    /// <summary>
-    /// Идентификатор доставщика
-    /// </summary>
-    public Guid? DriverId { get; set; }
-
-    /// <summary>
-    /// Доставщик
-    /// </summary>
-    public Driver? Driver { get; set; }
-
-    /// <summary>
-    /// Идентификатор транспорта
-    /// </summary>
-    public Guid? TransportId { get; set; }
-
-    /// <summary>
-    /// Транспорт
-    /// </summary>
-    public Transport? Transport { get; set; }
-
-    /// <summary>
-    /// Тип
-    /// </summary>
-    public OrderTypeEnum Type { get; set; }
+    public Guid? DriverTransportBindId { get; set; }
+    public DriverTransportBind? DriverTransportBind { get; set; }
 
     /// <summary>
     /// Адрес доставки
     /// </summary>
-    public required string Address { get; set; }
+    public Address Address { get; set; } = null!;
+
+    /// <summary>
+    /// Координаты доставки
+    /// </summary>
+    public required string Coordinates { get; set; }
 
     /// <summary>
     /// Дата доставки с
     /// </summary>
-    public required DateTimeOffset StartDate { get; set; }
+    public required DateTimeOffset DeliveryDateFrom { get; set; }
 
     /// <summary>
     /// Дата доставки по
     /// </summary>
-    public required DateTimeOffset EndDate { get; set; }
+    public required DateTimeOffset DeliveryDateTo { get; set; }
 
     /// <summary>
-    /// Тип оплаты
+    /// Дата забора с
     /// </summary>
-    public PaymentTypeEnum PaymentType { get; set; }
+    public required DateTimeOffset PickUpDateFrom { get; set; }
+
+    /// <summary>
+    /// Дата забора по
+    /// </summary>
+    public required DateTimeOffset PickUpDateTo { get; set; }
 
     /// <summary>
     /// Цена доставки
@@ -79,10 +82,20 @@ public class Order: BaseEntity<Guid>, IHasArchiveAttribute, IHasTrackDateAttribu
     public required decimal Price { get; set; }
 
     /// <summary>
-    /// Скидка
+    /// Статус заявки
     /// </summary>
-    public int Discount { get; set; }
-    
+    public OrderStatusEnum OrderStatus { get; set; }
+
+    /// <summary>
+    /// Дата заврешения заявки
+    /// </summary>
+    public DateTimeOffset? DateDelivered { get; set; }
+
+    /// <summary>
+    /// Идентификатор проблемы оптимизации
+    /// </summary>
+    public Guid? ProblemId { get; set; }
+
     public bool IsArchive { get; set; }
     public DateTimeOffset DateModified { get; set; }
     public DateTimeOffset DateCreated { get; set; }

@@ -1,6 +1,7 @@
 using Prolog.Abstractions.CommonModels.DaDataService.Models.Response;
 using Prolog.Application.Addresses.Dtos;
 using Prolog.Application.Addresses.Mappers;
+using Prolog.Domain.Entities;
 
 namespace Prolog.Application.Addresses.Mappers
 {

@@ -18,25 +18,25 @@ public class StorageMapRegister : IRegister
     public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<(CreateStorageModel Model, Guid ExternalSystemId), Storage>()
-            .Map(d => d.Address, src => src.Model.Address)
             .Map(d => d.Name, src => src.Model.Name)
             .Map(d => d.ExternalSystemId, src => src.ExternalSystemId)
-            .Map(d => d.Coordinates, src => string.Empty);
+            .Map(d => d.Coordinates, src => string.Empty)
+            .Ignore(x => x.Address);
 
         config.NewConfig<(CreateStorageModel Model, Storage Storage), Storage>()
-            .Map(d => d.Address, src => src.Model.Address)
             .Map(d => d.Name, src => src.Model.Name)
             .Map(d => d.ExternalSystemId, src => src.Storage.ExternalSystemId)
-            .Map(d => d.Coordinates, src => string.Empty);
+            .Map(d => d.Coordinates, src => string.Empty)
+            .Ignore(x => x.Address);
 
         config.NewConfig<Storage, StorageListViewModel>()
             .Map(d => d.Name, src => src.Name)
-            .Map(d => d.Address, src => src.Address)
+            .Map(d => d.Address, src => src.Address.AddressFullName)
             .Map(d => d.Id, src => src.Id);
 
         config.NewConfig<Storage, StorageViewModel>()
             .Map(d => d.Name, src => src.Name)
-            .Map(d => d.Address, src => src.Address)
+            .Map(d => d.Address, src => src.Address.AddressFullName)
             .Map(d => d.Id, src => src.Id);
     }
 }

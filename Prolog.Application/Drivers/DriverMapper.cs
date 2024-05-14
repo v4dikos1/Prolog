@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using Prolog.Application.Drivers.Dtos;
+using Prolog.Application.Orders.Dtos;
 using Prolog.Domain.Entities;
 
 namespace Prolog.Application.Drivers;
@@ -10,6 +11,7 @@ public interface IDriverMapper
     Driver MapToEntity((UpdateDriverModel model, Guid externalSystemId) src);
     Driver MapExisted(UpdateDriverModel model, Driver driver);
     DriverListViewModel MapToListViewModel(Driver driver);
+    OrderDriverViewModel MapToOrderDriverViewModel(DriverTransportBind bind);
 }
 
 internal class DriverMapRegister : IRegister
@@ -44,5 +46,17 @@ internal class DriverMapRegister : IRegister
             .Map(d => d.Patronymic, src => src.Patronymic)
             .Map(d => d.Salary, src => src.Salary)
             .Map(d => d.Telegram, src => src.Telegram);
+
+        config.NewConfig<DriverTransportBind, OrderDriverViewModel>()
+            .Map(d => d.DriverId, src => src.Driver.Id)
+            .Map(d => d.Name, src => src.Driver.Name)
+            .Map(d => d.PhoneNumber, src => src.Driver.PhoneNumber)
+            .Map(d => d.LicencePlate, src => src.Transport.LicencePlate)
+            .Map(d => d.TransportId, src => src.Transport.Id)
+            .Map(d => d.StartDate, src => src.StartDate)
+            .Map(d => d.EndDate, src => src.EndDate)
+            .Map(d => d.TotalOrdersCount, src => src.TotalOrdersCount)
+            .Map(d => d.OrdersCompletedCount, src => src.OrdersCompletedCount)
+            .Map(d => d.Distance, src => src.Distance);
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using Prolog.Application.Drivers;
 using Prolog.Application.Drivers.Dtos;
+using Prolog.Application.Orders.Dtos;
 using Prolog.Domain.Entities;
 
 namespace Prolog.Application.Drivers
@@ -49,6 +50,32 @@ namespace Prolog.Application.Drivers
                 Telegram = p4.Telegram,
                 Salary = (long)p4.Salary
             };
+        }
+        public OrderDriverViewModel MapToOrderDriverViewModel(DriverTransportBind p5)
+        {
+            return p5 == null ? null : new OrderDriverViewModel()
+            {
+                DriverId = funcMain1(p5.Driver == null ? null : (Guid?)p5.Driver.Id),
+                Name = p5.Driver == null ? null : p5.Driver.Name,
+                PhoneNumber = p5.Driver == null ? null : p5.Driver.PhoneNumber,
+                LicencePlate = p5.Transport == null ? null : p5.Transport.LicencePlate,
+                TransportId = funcMain2(p5.Transport == null ? null : (Guid?)p5.Transport.Id),
+                StartDate = p5.StartDate,
+                EndDate = p5.EndDate,
+                TotalOrdersCount = p5.TotalOrdersCount,
+                OrdersCompletedCount = p5.OrdersCompletedCount,
+                Distance = p5.Distance
+            };
+        }
+        
+        private Guid funcMain1(Guid? p6)
+        {
+            return p6 == null ? default(Guid) : (Guid)p6;
+        }
+        
+        private Guid funcMain2(Guid? p7)
+        {
+            return p7 == null ? default(Guid) : (Guid)p7;
         }
     }
 }

@@ -8,14 +8,32 @@ namespace Prolog.Domain.Enums;
 public enum OrderStatusEnum
 {
     /// <summary>
-    /// Доставлен
+    /// Входящая
     /// </summary>
-    [Description("Доставлен")]
-    Delivered = 0,
+    [Description("Входящая")]
+    Incoming = 0,
 
     /// <summary>
-    /// Отменен
+    /// Активная
     /// </summary>
-    [Description("Отменен")]
-    Cancelled = 1
+    [Description("Активная")]
+    Active = 1,
+
+    /// <summary>
+    /// Запланированная
+    /// </summary>
+    [Description("Запланированная")]
+    Planned = 4,
+
+    /// <summary>
+    /// Завершенная
+    /// </summary>
+    [Description("Завершенная")]
+    Completed = 2,
+
+    /// <summary>
+    /// Отменена
+    /// </summary>
+    [Description("Отменена")]
+    Cancelled = 3
 }

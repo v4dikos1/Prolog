@@ -9,7 +9,7 @@ internal class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applica
     {
         var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
         optionsBuilder.UseNpgsql(
-            "Host=localhost;Database=prolog;Username=postgres;Password=12345;Include Error Detail=true");
+            "Host=localhost;Database=prolog2;Username=postgres;Password=65798732;Include Error Detail=true");
         return new ApplicationDbContext(optionsBuilder.Options);
     }
 }

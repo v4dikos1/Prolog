@@ -13,7 +13,6 @@ namespace Prolog.Application.Storages
             {
                 ExternalSystemId = p1.Item2,
                 Name = p1.Item1.Name,
-                Address = p1.Item1.Address,
                 Coordinates = string.Empty
             };
         }
@@ -26,7 +25,7 @@ namespace Prolog.Application.Storages
             Storage result = p3 ?? new Storage();
             
             result.Name = p2.Name;
-            result.Address = p2.Address;
+            result.Address = p2.Address == null ? null : (Address)Convert.ChangeType((object)p2.Address, typeof(Address));
             return result;
             
         }
@@ -36,7 +35,7 @@ namespace Prolog.Application.Storages
             {
                 Id = p4.Id,
                 Name = p4.Name,
-                Address = p4.Address
+                Address = p4.Address == null ? null : p4.Address.AddressFullName
             };
         }
         public StorageViewModel MapToViewModel(Storage p5)
@@ -45,7 +44,7 @@ namespace Prolog.Application.Storages
             {
                 Id = p5.Id,
                 Name = p5.Name,
-                Address = p5.Address
+                Address = p5.Address == null ? null : p5.Address.AddressFullName
             };
         }
     }

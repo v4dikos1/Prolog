@@ -27,4 +27,8 @@
 	  <ProjectReference Include="..\Prolog.Core\Prolog.Core.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Migrations\" />
+	</ItemGroup>
+
 </Project>

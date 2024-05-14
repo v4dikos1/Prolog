@@ -10,7 +10,7 @@ public class OrderItem: BaseEntity<Guid>, IHasArchiveAttribute, IHasTrackDateAtt
     /// <summary>
     /// Идентификатор заявки
     /// </summary>
-    public required Guid OrderId { get; set; }
+    public long OrderId { get; set; }
 
     /// <summary>
     /// Заявка
@@ -18,14 +18,34 @@ public class OrderItem: BaseEntity<Guid>, IHasArchiveAttribute, IHasTrackDateAtt
     public Order Order { get; set; } = null!;
 
     /// <summary>
-    /// Идентификатор конкретного товара со склада
+    /// Идентификатор товара
     /// </summary>
-    public required Guid ProductItemId { get; set; }
+    public required Guid ProductId { get; set; }
 
     /// <summary>
-    /// Конкретный товар со склада
+    /// Товар
     /// </summary>
-    public ProductItem ProductItem { get; set; } = null!;
+    public Product Product { get; set; } = null!;
+
+    /// <summary>
+    /// Вес товара
+    /// </summary>
+    public decimal Weight { get; set; }
+
+    /// <summary>
+    /// Объем товара
+    /// </summary>
+    public decimal Volume { get; set; }
+
+    /// <summary>
+    /// Цена (в копейках)
+    /// </summary>
+    public long Price { get; set; }
+
+    /// <summary>
+    /// Количество товара
+    /// </summary>
+    public long Count { get; set; }
 
     public bool IsArchive { get; set; }
     public DateTimeOffset DateModified { get; set; }

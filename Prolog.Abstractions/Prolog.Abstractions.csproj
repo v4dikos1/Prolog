@@ -11,8 +11,4 @@
     <ProjectReference Include="..\Prolog.Domain\Prolog.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="CommonModels\DaDataService\" />
-  </ItemGroup>
-
 </Project>

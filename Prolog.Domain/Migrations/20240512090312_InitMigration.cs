@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using Prolog.Domain.Entities;
 
 #nullable disable
 
 namespace Prolog.Domain.Migrations
 {
     /// <inheritdoc />
-    public partial class init_migration : Migration
+    public partial class InitMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -55,10 +57,7 @@ namespace Prolog.Domain.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     external_system_id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "text", nullable: false),
-                    surname = table.Column<string>(type: "text", nullable: false),
-                    patronymic = table.Column<string>(type: "text", nullable: false),
                     phone_number = table.Column<string>(type: "text", nullable: false),
-                    email = table.Column<string>(type: "text", nullable: false),
                     is_archive = table.Column<bool>(type: "boolean", nullable: false),
                     date_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     date_created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
@@ -80,12 +79,12 @@ namespace Prolog.Domain.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     external_system_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    salary = table.Column<decimal>(type: "numeric", nullable: false),
                     name = table.Column<string>(type: "text", nullable: false),
                     surname = table.Column<string>(type: "text", nullable: false),
                     patronymic = table.Column<string>(type: "text", nullable: false),
                     phone_number = table.Column<string>(type: "text", nullable: false),
-                    email = table.Column<string>(type: "text", nullable: false),
-                    type = table.Column<int>(type: "integer", nullable: false),
+                    telegram = table.Column<string>(type: "text", nullable: false),
                     is_archive = table.Column<bool>(type: "boolean", nullable: false),
                     date_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     date_created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
@@ -107,10 +106,11 @@ namespace Prolog.Domain.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     external_system_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    code = table.Column<string>(type: "text", nullable: false),
                     name = table.Column<string>(type: "text", nullable: false),
                     weight = table.Column<decimal>(type: "numeric", nullable: false),
+                    volume = table.Column<decimal>(type: "numeric", nullable: false),
                     price = table.Column<long>(type: "bigint", nullable: false),
-                    description = table.Column<string>(type: "text", nullable: true),
                     is_archive = table.Column<bool>(type: "boolean", nullable: false),
                     date_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     date_created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
@@ -133,7 +133,7 @@ namespace Prolog.Domain.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     external_system_id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "text", nullable: false),
-                    address = table.Column<string>(type: "text", nullable: false),
+                    address = table.Column<Address>(type: "jsonb", nullable: false),
                     coordinates = table.Column<string>(type: "text", nullable: false),
                     is_archive = table.Column<bool>(type: "boolean", nullable: false),
                     date_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -156,11 +156,11 @@ namespace Prolog.Domain.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     external_system_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    type = table.Column<int>(type: "integer", nullable: false),
                     volume = table.Column<decimal>(type: "numeric", nullable: false),
                     capacity = table.Column<decimal>(type: "numeric", nullable: false),
                     fuel_consumption = table.Column<decimal>(type: "numeric", nullable: false),
                     licence_plate = table.Column<string>(type: "text", nullable: false),
+                    brand = table.Column<string>(type: "text", nullable: false),
                     is_archive = table.Column<bool>(type: "boolean", nullable: false),
                     date_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     date_created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
@@ -180,18 +180,21 @@ namespace Prolog.Domain.Migrations
                 name: "order",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     external_system_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    storage_id = table.Column<Guid>(type: "uuid", nullable: false),
                     customer_id = table.Column<Guid>(type: "uuid", nullable: false),
                     driver_id = table.Column<Guid>(type: "uuid", nullable: true),
                     transport_id = table.Column<Guid>(type: "uuid", nullable: true),
-                    type = table.Column<int>(type: "integer", nullable: false),
-                    address = table.Column<string>(type: "text", nullable: false),
-                    start_date = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    end_date = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    payment_type = table.Column<int>(type: "integer", nullable: false),
+                    address = table.Column<Address>(type: "jsonb", nullable: false),
+                    delivery_date_from = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    delivery_date_to = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    pick_up_date_from = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    pick_up_date_to = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     price = table.Column<decimal>(type: "numeric", nullable: false),
-                    discount = table.Column<int>(type: "integer", nullable: false),
+                    order_status = table.Column<int>(type: "integer", nullable: false),
+                    date_delivered = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     is_archive = table.Column<bool>(type: "boolean", nullable: false),
                     date_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     date_created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
@@ -218,6 +221,12 @@ namespace Prolog.Domain.Migrations
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
+                        name: "fk_order_storages_storage_id",
+                        column: x => x.storage_id,
+                        principalTable: "storage",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "fk_order_transports_transport_id",
                         column: x => x.transport_id,
                         principalTable: "transport",
@@ -230,8 +239,12 @@ namespace Prolog.Domain.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
-                    order_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    product_item_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    order_id = table.Column<long>(type: "bigint", nullable: false),
+                    product_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    weight = table.Column<decimal>(type: "numeric", nullable: false),
+                    volume = table.Column<decimal>(type: "numeric", nullable: false),
+                    price = table.Column<long>(type: "bigint", nullable: false),
+                    count = table.Column<long>(type: "bigint", nullable: false),
                     is_archive = table.Column<bool>(type: "boolean", nullable: false),
                     date_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     date_created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
@@ -245,39 +258,10 @@ namespace Prolog.Domain.Migrations
                         principalTable: "order",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "product_item",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
-                    product_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    storage_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    order_item_id = table.Column<Guid>(type: "uuid", nullable: true),
-                    is_archive = table.Column<bool>(type: "boolean", nullable: false),
-                    date_modified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    date_created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_product_item", x => x.id);
                     table.ForeignKey(
-                        name: "fk_product_item_order_item_order_item_id",
-                        column: x => x.order_item_id,
-                        principalTable: "order_item",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "fk_product_item_product_product_id",
+                        name: "fk_order_item_products_product_id",
                         column: x => x.product_id,
                         principalTable: "product",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "fk_product_item_storages_storage_id",
-                        column: x => x.storage_id,
-                        principalTable: "storage",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -314,6 +298,11 @@ namespace Prolog.Domain.Migrations
                 column: "external_system_id");
 
             migrationBuilder.CreateIndex(
+                name: "ix_order_storage_id",
+                table: "order",
+                column: "storage_id");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_order_transport_id",
                 table: "order",
                 column: "transport_id");
@@ -324,31 +313,14 @@ namespace Prolog.Domain.Migrations
                 column: "order_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_order_item_product_item_id",
+                name: "ix_order_item_product_id",
                 table: "order_item",
-                column: "product_item_id",
-                unique: true);
+                column: "product_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_product_external_system_id",
                 table: "product",
                 column: "external_system_id");
-
-            migrationBuilder.CreateIndex(
-                name: "ix_product_item_order_item_id",
-                table: "product_item",
-                column: "order_item_id",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "ix_product_item_product_id",
-                table: "product_item",
-                column: "product_id");
-
-            migrationBuilder.CreateIndex(
-                name: "ix_product_item_storage_id",
-                table: "product_item",
-                column: "storage_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_storage_external_system_id",
@@ -359,68 +331,22 @@ namespace Prolog.Domain.Migrations
                 name: "ix_transport_external_system_id",
                 table: "transport",
                 column: "external_system_id");
-
-            migrationBuilder.AddForeignKey(
-                name: "fk_order_item_product_items_product_item_id",
-                table: "order_item",
-                column: "product_item_id",
-                principalTable: "product_item",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Restrict);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "fk_customer_external_systems_external_system_id",
-                table: "customer");
-
-            migrationBuilder.DropForeignKey(
-                name: "fk_driver_external_systems_external_system_id",
-                table: "driver");
-
-            migrationBuilder.DropForeignKey(
-                name: "fk_order_external_system_external_system_id",
-                table: "order");
-
-            migrationBuilder.DropForeignKey(
-                name: "fk_product_external_system_external_system_id",
-                table: "product");
-
-            migrationBuilder.DropForeignKey(
-                name: "fk_storage_external_system_external_system_id",
-                table: "storage");
-
-            migrationBuilder.DropForeignKey(
-                name: "fk_transport_external_system_external_system_id",
-                table: "transport");
-
-            migrationBuilder.DropForeignKey(
-                name: "fk_order_customer_customer_id",
-                table: "order");
-
-            migrationBuilder.DropForeignKey(
-                name: "fk_order_driver_driver_id",
-                table: "order");
-
-            migrationBuilder.DropForeignKey(
-                name: "fk_order_transports_transport_id",
-                table: "order");
-
-            migrationBuilder.DropForeignKey(
-                name: "fk_order_item_order_order_id",
-                table: "order_item");
-
-            migrationBuilder.DropForeignKey(
-                name: "fk_order_item_product_items_product_item_id",
-                table: "order_item");
-
             migrationBuilder.DropTable(
                 name: "action_log");
 
             migrationBuilder.DropTable(
-                name: "external_system");
+                name: "order_item");
+
+            migrationBuilder.DropTable(
+                name: "order");
+
+            migrationBuilder.DropTable(
+                name: "product");
 
             migrationBuilder.DropTable(
                 name: "customer");
@@ -429,22 +355,13 @@ namespace Prolog.Domain.Migrations
                 name: "driver");
 
             migrationBuilder.DropTable(
+                name: "storage");
+
+            migrationBuilder.DropTable(
                 name: "transport");
 
             migrationBuilder.DropTable(
-                name: "order");
-
-            migrationBuilder.DropTable(
-                name: "product_item");
-
-            migrationBuilder.DropTable(
-                name: "order_item");
-
-            migrationBuilder.DropTable(
-                name: "product");
-
-            migrationBuilder.DropTable(
-                name: "storage");
+                name: "external_system");
         }
     }
 }

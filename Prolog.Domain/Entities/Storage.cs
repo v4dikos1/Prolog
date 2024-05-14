@@ -25,7 +25,7 @@ public class Storage: BaseEntity<Guid>, IHasArchiveAttribute, IHasTrackDateAttri
     /// <summary>
     /// Адрес
     /// </summary>
-    public string Address { get; set; } = string.Empty;
+    public Address Address { get; set; } = null!;
 
     /// <summary>
     /// Координаты

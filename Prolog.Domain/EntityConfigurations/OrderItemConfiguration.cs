@@ -14,15 +14,20 @@ internal class OrderItemConfiguration: IEntityTypeConfiguration<OrderItem>
 
         builder.Property(x => x.OrderId).IsRequired();
         builder.HasOne(x => x.Order)
-            .WithMany()
+            .WithMany(x => x.Items)
             .HasForeignKey(x => x.OrderId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Property(x => x.ProductItemId).IsRequired();
-        builder.HasOne(x => x.ProductItem)
-            .WithOne()
-            .HasForeignKey<OrderItem>(x => x.ProductItemId)
+        builder.Property(x => x.ProductId).IsRequired();
+        builder.HasOne(x => x.Product)
+            .WithMany()
+            .HasForeignKey(x => x.ProductId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property(x => x.Price).IsRequired();
+        builder.Property(x => x.Volume).IsRequired();
+        builder.Property(x => x.Weight).IsRequired();
+        builder.Property(x => x.Count).IsRequired();
 
         builder.Property(x => x.IsArchive).IsRequired();
         builder.Property(x => x.DateCreated).IsRequired();

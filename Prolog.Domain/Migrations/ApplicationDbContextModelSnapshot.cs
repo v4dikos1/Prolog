@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Prolog.Domain;
+using Prolog.Domain.Entities;
 
 #nullable disable
 
@@ -180,6 +181,65 @@ namespace Prolog.Domain.Migrations
                     b.ToTable("driver", (string)null);
                 });
 
+            modelBuilder.Entity("Prolog.Domain.Entities.DriverTransportBind", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("DateCreated")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("date_created");
+
+                    b.Property<DateTimeOffset>("DateModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("date_modified");
+
+                    b.Property<decimal>("Distance")
+                        .HasColumnType("numeric")
+                        .HasColumnName("distance");
+
+                    b.Property<Guid>("DriverId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("driver_id");
+
+                    b.Property<DateTimeOffset>("EndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("end_date");
+
+                    b.Property<int>("OrdersCompletedCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("orders_completed_count");
+
+                    b.Property<Guid>("ProblemId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("problem_id");
+
+                    b.Property<DateTimeOffset>("StartDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("start_date");
+
+                    b.Property<int>("TotalOrdersCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("total_orders_count");
+
+                    b.Property<Guid>("TransportId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("transport_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_driver_transport_bind");
+
+                    b.HasIndex("DriverId")
+                        .HasDatabaseName("ix_driver_transport_bind_driver_id");
+
+                    b.HasIndex("TransportId")
+                        .HasDatabaseName("ix_driver_transport_bind_transport_id");
+
+                    b.ToTable("driver_transport_bind", (string)null);
+                });
+
             modelBuilder.Entity("Prolog.Domain.Entities.ExternalSystem", b =>
                 {
                     b.Property<Guid>("Id")
@@ -220,15 +280,22 @@ namespace Prolog.Domain.Migrations
 
             modelBuilder.Entity("Prolog.Domain.Entities.Order", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("bigint")
                         .HasColumnName("id");
 
-                    b.Property<string>("Address")
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<Address>("Address")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("address");
+
+                    b.Property<string>("Coordinates")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("address");
+                        .HasColumnName("coordinates");
 
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uuid")
@@ -238,21 +305,25 @@ namespace Prolog.Domain.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date_created");
 
+                    b.Property<DateTimeOffset?>("DateDelivered")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("date_delivered");
+
                     b.Property<DateTimeOffset>("DateModified")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date_modified");
 
-                    b.Property<int>("Discount")
-                        .HasColumnType("integer")
-                        .HasColumnName("discount");
-
-                    b.Property<Guid?>("DriverId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("driver_id");
-
-                    b.Property<DateTimeOffset>("EndDate")
+                    b.Property<DateTimeOffset>("DeliveryDateFrom")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("end_date");
+                        .HasColumnName("delivery_date_from");
+
+                    b.Property<DateTimeOffset>("DeliveryDateTo")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("delivery_date_to");
+
+                    b.Property<Guid?>("DriverTransportBindId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("driver_transport_bind_id");
 
                     b.Property<Guid>("ExternalSystemId")
                         .HasColumnType("uuid")
@@ -262,25 +333,29 @@ namespace Prolog.Domain.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_archive");
 
-                    b.Property<int>("PaymentType")
+                    b.Property<int>("OrderStatus")
                         .HasColumnType("integer")
-                        .HasColumnName("payment_type");
+                        .HasColumnName("order_status");
+
+                    b.Property<DateTimeOffset>("PickUpDateFrom")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("pick_up_date_from");
+
+                    b.Property<DateTimeOffset>("PickUpDateTo")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("pick_up_date_to");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric")
                         .HasColumnName("price");
 
-                    b.Property<DateTimeOffset>("StartDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("start_date");
-
-                    b.Property<Guid?>("TransportId")
+                    b.Property<Guid?>("ProblemId")
                         .HasColumnType("uuid")
-                        .HasColumnName("transport_id");
+                        .HasColumnName("problem_id");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("integer")
-                        .HasColumnName("type");
+                    b.Property<Guid>("StorageId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("storage_id");
 
                     b.HasKey("Id")
                         .HasName("pk_order");
@@ -288,19 +363,74 @@ namespace Prolog.Domain.Migrations
                     b.HasIndex("CustomerId")
                         .HasDatabaseName("ix_order_customer_id");
 
-                    b.HasIndex("DriverId")
-                        .HasDatabaseName("ix_order_driver_id");
+                    b.HasIndex("DriverTransportBindId")
+                        .HasDatabaseName("ix_order_driver_transport_bind_id");
 
                     b.HasIndex("ExternalSystemId")
                         .HasDatabaseName("ix_order_external_system_id");
 
-                    b.HasIndex("TransportId")
-                        .HasDatabaseName("ix_order_transport_id");
+                    b.HasIndex("StorageId")
+                        .HasDatabaseName("ix_order_storage_id");
 
                     b.ToTable("order", (string)null);
                 });
 
             modelBuilder.Entity("Prolog.Domain.Entities.OrderItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<long>("Count")
+                        .HasColumnType("bigint")
+                        .HasColumnName("count");
+
+                    b.Property<DateTimeOffset>("DateCreated")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("date_created");
+
+                    b.Property<DateTimeOffset>("DateModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("date_modified");
+
+                    b.Property<bool>("IsArchive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_archive");
+
+                    b.Property<long>("OrderId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("order_id");
+
+                    b.Property<long>("Price")
+                        .HasColumnType("bigint")
+                        .HasColumnName("price");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("product_id");
+
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("numeric")
+                        .HasColumnName("volume");
+
+                    b.Property<decimal>("Weight")
+                        .HasColumnType("numeric")
+                        .HasColumnName("weight");
+
+                    b.HasKey("Id")
+                        .HasName("pk_order_item");
+
+                    b.HasIndex("OrderId")
+                        .HasDatabaseName("ix_order_item_order_id");
+
+                    b.HasIndex("ProductId")
+                        .HasDatabaseName("ix_order_item_product_id");
+
+                    b.ToTable("order_item", (string)null);
+                });
+
+            modelBuilder.Entity("Prolog.Domain.Entities.ProblemSolution", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -315,29 +445,37 @@ namespace Prolog.Domain.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date_modified");
 
-                    b.Property<bool>("IsArchive")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_archive");
+                    b.Property<int>("Index")
+                        .HasColumnType("integer")
+                        .HasColumnName("index");
 
-                    b.Property<Guid>("OrderId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("order_id");
+                    b.Property<string>("Latitude")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("latitude");
 
-                    b.Property<Guid>("ProductItemId")
+                    b.Property<string>("LocationId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("location_id");
+
+                    b.Property<string>("Longitude")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("longitude");
+
+                    b.Property<Guid>("ProblemId")
                         .HasColumnType("uuid")
-                        .HasColumnName("product_item_id");
+                        .HasColumnName("problem_id");
+
+                    b.Property<int>("StopType")
+                        .HasColumnType("integer")
+                        .HasColumnName("stop_type");
 
                     b.HasKey("Id")
-                        .HasName("pk_order_item");
+                        .HasName("pk_problem_solution");
 
-                    b.HasIndex("OrderId")
-                        .HasDatabaseName("ix_order_item_order_id");
-
-                    b.HasIndex("ProductItemId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_order_item_product_item_id");
-
-                    b.ToTable("order_item", (string)null);
+                    b.ToTable("problem_solution", (string)null);
                 });
 
             modelBuilder.Entity("Prolog.Domain.Entities.Product", b =>
@@ -394,53 +532,6 @@ namespace Prolog.Domain.Migrations
                     b.ToTable("product", (string)null);
                 });
 
-            modelBuilder.Entity("Prolog.Domain.Entities.ProductItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<DateTimeOffset>("DateCreated")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("date_created");
-
-                    b.Property<DateTimeOffset>("DateModified")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("date_modified");
-
-                    b.Property<bool>("IsArchive")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_archive");
-
-                    b.Property<Guid?>("OrderItemId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("order_item_id");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("product_id");
-
-                    b.Property<Guid>("StorageId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("storage_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_product_item");
-
-                    b.HasIndex("OrderItemId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_product_item_order_item_id");
-
-                    b.HasIndex("ProductId")
-                        .HasDatabaseName("ix_product_item_product_id");
-
-                    b.HasIndex("StorageId")
-                        .HasDatabaseName("ix_product_item_storage_id");
-
-                    b.ToTable("product_item", (string)null);
-                });
-
             modelBuilder.Entity("Prolog.Domain.Entities.Storage", b =>
                 {
                     b.Property<Guid>("Id")
@@ -448,9 +539,9 @@ namespace Prolog.Domain.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<string>("Address")
+                    b.Property<Address>("Address")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("jsonb")
                         .HasColumnName("address");
 
                     b.Property<string>("Coordinates")
@@ -566,6 +657,27 @@ namespace Prolog.Domain.Migrations
                     b.Navigation("ExternalSystem");
                 });
 
+            modelBuilder.Entity("Prolog.Domain.Entities.DriverTransportBind", b =>
+                {
+                    b.HasOne("Prolog.Domain.Entities.Driver", "Driver")
+                        .WithMany()
+                        .HasForeignKey("DriverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_driver_transport_bind_driver_driver_id");
+
+                    b.HasOne("Prolog.Domain.Entities.Transport", "Transport")
+                        .WithMany()
+                        .HasForeignKey("TransportId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_driver_transport_bind_transports_transport_id");
+
+                    b.Navigation("Driver");
+
+                    b.Navigation("Transport");
+                });
+
             modelBuilder.Entity("Prolog.Domain.Entities.Order", b =>
                 {
                     b.HasOne("Prolog.Domain.Entities.Customer", "Customer")
@@ -575,11 +687,11 @@ namespace Prolog.Domain.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_order_customer_customer_id");
 
-                    b.HasOne("Prolog.Domain.Entities.Driver", "Driver")
+                    b.HasOne("Prolog.Domain.Entities.DriverTransportBind", "DriverTransportBind")
                         .WithMany()
-                        .HasForeignKey("DriverId")
+                        .HasForeignKey("DriverTransportBindId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_order_driver_driver_id");
+                        .HasConstraintName("fk_order_driver_transport_bind_driver_transport_bind_id");
 
                     b.HasOne("Prolog.Domain.Entities.ExternalSystem", "ExternalSystem")
                         .WithMany()
@@ -588,40 +700,41 @@ namespace Prolog.Domain.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_order_external_system_external_system_id");
 
-                    b.HasOne("Prolog.Domain.Entities.Transport", "Transport")
+                    b.HasOne("Prolog.Domain.Entities.Storage", "Storage")
                         .WithMany()
-                        .HasForeignKey("TransportId")
+                        .HasForeignKey("StorageId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_order_transports_transport_id");
+                        .IsRequired()
+                        .HasConstraintName("fk_order_storages_storage_id");
 
                     b.Navigation("Customer");
 
-                    b.Navigation("Driver");
+                    b.Navigation("DriverTransportBind");
 
                     b.Navigation("ExternalSystem");
 
-                    b.Navigation("Transport");
+                    b.Navigation("Storage");
                 });
 
             modelBuilder.Entity("Prolog.Domain.Entities.OrderItem", b =>
                 {
                     b.HasOne("Prolog.Domain.Entities.Order", "Order")
-                        .WithMany()
+                        .WithMany("Items")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_order_item_order_order_id");
 
-                    b.HasOne("Prolog.Domain.Entities.ProductItem", "ProductItem")
-                        .WithOne()
-                        .HasForeignKey("Prolog.Domain.Entities.OrderItem", "ProductItemId")
+                    b.HasOne("Prolog.Domain.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("fk_order_item_product_items_product_item_id");
+                        .HasConstraintName("fk_order_item_products_product_id");
 
                     b.Navigation("Order");
 
-                    b.Navigation("ProductItem");
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Prolog.Domain.Entities.Product", b =>
@@ -634,35 +747,6 @@ namespace Prolog.Domain.Migrations
                         .HasConstraintName("fk_product_external_system_external_system_id");
 
                     b.Navigation("ExternalSystem");
-                });
-
-            modelBuilder.Entity("Prolog.Domain.Entities.ProductItem", b =>
-                {
-                    b.HasOne("Prolog.Domain.Entities.OrderItem", "OrderItem")
-                        .WithOne()
-                        .HasForeignKey("Prolog.Domain.Entities.ProductItem", "OrderItemId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_product_item_order_item_order_item_id");
-
-                    b.HasOne("Prolog.Domain.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_product_item_product_product_id");
-
-                    b.HasOne("Prolog.Domain.Entities.Storage", "Storage")
-                        .WithMany()
-                        .HasForeignKey("StorageId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_product_item_storages_storage_id");
-
-                    b.Navigation("OrderItem");
-
-                    b.Navigation("Product");
-
-                    b.Navigation("Storage");
                 });
 
             modelBuilder.Entity("Prolog.Domain.Entities.Storage", b =>
@@ -687,6 +771,11 @@ namespace Prolog.Domain.Migrations
                         .HasConstraintName("fk_transport_external_system_external_system_id");
 
                     b.Navigation("ExternalSystem");
+                });
+
+            modelBuilder.Entity("Prolog.Domain.Entities.Order", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

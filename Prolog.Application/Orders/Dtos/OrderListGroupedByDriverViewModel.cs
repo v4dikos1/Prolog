@@ -14,4 +14,9 @@ public class OrderListGroupedByDriverViewModel
     /// Заявки
     /// </summary>
     public required IEnumerable<OrderListViewModel> Orders { get; set; }
+
+    /// <summary>
+    /// Маршрут
+    /// </summary>
+    public IEnumerable<RouteViewModel> Routes { get; set; } = new List<RouteViewModel>();
 }
