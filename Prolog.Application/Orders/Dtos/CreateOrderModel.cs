@@ -28,12 +28,12 @@ public class CreateOrderModel
     /// <summary>
     /// Дата доставки "с" (Формат: dd-mm-yyyyThh:ss+(-)hh:mm. Например, 05-03-2024T12:00+07:00)
     /// </summary>
-    public DateTimeOffset? DeliveryDateFrom { get; set; }
+    public required DateTimeOffset DeliveryDateFrom { get; set; }
     
     /// <summary>
     /// Дата доставки "до" (Формат: dd-mm-yyyyThh:ss+(-)hh:mm. Например, 05-03-2024T12:00+07:00)
     /// </summary>
-    public DateTimeOffset? DeliveryDateTo { get; set; }
+    public required DateTimeOffset DeliveryDateTo { get; set; }
 
     /// <summary>
     /// Идентификатор клиента
@@ -48,5 +48,5 @@ public class CreateOrderModel
     /// <summary>
     /// Идентификаторы товаров
     /// </summary>
-    public required IEnumerable<Guid> ProductIds { get; set; }
+    public required IEnumerable<ProductInOrderModel> Products { get; set; }
 }

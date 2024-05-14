@@ -35,7 +35,7 @@ internal class CreateOrderCommandValidator: AbstractValidator<CreateOrderCommand
             .NotEmpty()
             .WithMessage("Дата забора \"до\" является обязательным параметром!");
 
-        RuleFor(x => x.Body.ProductIds)
+        RuleFor(x => x.Body.Products)
             .NotEmpty()
             .WithMessage("Список идентификаторов товаров не должен быть пустым!");
     }

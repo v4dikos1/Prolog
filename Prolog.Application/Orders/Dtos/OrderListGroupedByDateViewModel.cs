@@ -19,6 +19,4 @@ public class OrderListGroupedByDateViewModel
     /// Список заявок, сгруппированных по водителю
     /// </summary>
     public required IEnumerable<OrderListGroupedByDriverViewModel> OrdersGroupedByDriver { get; set; }
-
-    //public required IEnumerable<OrderListViewModel> Orders { get; set; } 
 }

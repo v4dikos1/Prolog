@@ -13,7 +13,9 @@ internal class StorageConfiguration: IEntityTypeConfiguration<Storage>
         builder.Property(x => x.Id).IsRequired();
 
         builder.Property(x => x.Name).IsRequired();
-        builder.Property(x => x.Address).IsRequired();
+        builder.Property(x => x.Address)
+            .IsRequired()
+            .HasColumnType("jsonb");
         builder.Property(x => x.Coordinates).IsRequired();
 
         builder.Property(x => x.ExternalSystemId).IsRequired();

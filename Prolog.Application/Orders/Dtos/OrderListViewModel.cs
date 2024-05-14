@@ -18,34 +18,14 @@ public class OrderListViewModel
     public required string VisibleId { get; set; }
 
     /// <summary>
-    /// Адрес доставки
+    /// Информация о клиенте
     /// </summary>
-    public required string Address { get; set; }
+    public required ClientOrderViewModel Client { get; set; }
 
     /// <summary>
-    /// Идентификатор склада
+    /// Информация о складе
     /// </summary>
-    public required Guid StorageId { get; set; }
-
-    /// <summary>
-    /// Наименование склада
-    /// </summary>
-    public required string StorageName { get; set; }
-
-    /// <summary>
-    /// Идентификатор клиента
-    /// </summary>
-    public required Guid ClientId { get; set; }
-
-    /// <summary>
-    /// Наименование клиента
-    /// </summary>
-    public required string ClientName { get; set; }
-
-    /// <summary>
-    /// Контактный телефон клиента
-    /// </summary>
-    public required string ClientPhone { get; set; }
+    public required StorageOrderViewModel Storage { get; set; }
 
     /// <summary>
     /// Стоимость доставки
@@ -100,5 +80,5 @@ public class OrderListViewModel
     /// <summary>
     /// Статус
     /// </summary>
-    public OrderStatusEnum? Status { get; set; }
+    public OrderStatusEnum Status { get; set; }
 }

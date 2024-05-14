@@ -2,6 +2,7 @@ using NLog;
 using NLog.Web;
 using Prolog.Abstractions.CommonModels;
 using Prolog.Api.Http;
+using Prolog.Api.Jobs.Configuration;
 using Prolog.Api.Middlewares;
 using Prolog.Api.StartupConfigurations;
 using Prolog.Api.StartupConfigurations.Options;
@@ -37,11 +38,14 @@ try
 
     builder.Services.ConfigureOptions<KeycloakConfigurationSetup>();
     builder.Services.ConfigureOptions<KeycloakScopesConfigurationSetup>();
+    builder.Services.ConfigureOptions<MapBoxConfiguration>();
 
     builder.Services.RegisterExternalInfrastructureServices();
     builder.Services.RegisterKeycloakServices();
     builder.Services.ConfigureOwnSwagger();
     builder.Services.AddKeycloakConfig();
+
+    builder.Services.RegisterQuartzJobs(builder.Configuration);
 
     builder.Services.AddScoped<ICurrentHttpContextAccessor, CurrentHttpContextAccessor>();
 

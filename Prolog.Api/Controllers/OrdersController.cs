@@ -62,4 +62,16 @@ public class OrdersController(ISender sender): BaseController
     {
         await sender.Send(command, cancellationToken);
     }
+
+    /// <summary>
+    /// Планирование заявки
+    /// </summary>
+    /// <param name="command">Модель запроса</param>
+    /// <param name="cancellationToken">Токен отмены</param>
+    /// <returns></returns>
+    [HttpPost("planning")]
+    public async Task PlanOrders([FromQuery] PlanOrdersCommand command, CancellationToken cancellationToken)
+    {
+        await sender.Send(command, cancellationToken);
+    }
 }

@@ -18,33 +18,35 @@ internal class OrderConfiguration: IEntityTypeConfiguration<Order>
             .HasForeignKey(x => x.CustomerId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Property(x => x.DriverId).IsRequired(false);
-        builder.HasOne(x => x.Driver)
+        builder.Property(x => x.DriverTransportBindId).IsRequired(false);
+        builder.HasOne(x => x.DriverTransportBind)
             .WithMany()
-            .HasForeignKey(x => x.DriverId)
+            .HasForeignKey(x => x.DriverTransportBindId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Property(x => x.TransportId).IsRequired(false);
-        builder.HasOne(x => x.Transport)
+        builder.Property(x => x.StorageId).IsRequired();
+        builder.HasOne(x => x.Storage)
             .WithMany()
-            .HasForeignKey(x => x.TransportId)
+            .HasForeignKey(x => x.StorageId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Property(x => x.Type).IsRequired();
-        builder.Property(x => x.Address).IsRequired();
-        builder.Property(x => x.StartDate).IsRequired();
-        builder.Property(x => x.EndDate).IsRequired();
-        builder.Property(x => x.PaymentType).IsRequired();
+        builder.Property(x => x.Address)
+            .IsRequired()
+            .HasColumnType("jsonb");
+
+        builder.Property(x => x.Coordinates).IsRequired();
+        builder.Property(x => x.DeliveryDateFrom).IsRequired();
+        builder.Property(x => x.PickUpDateFrom).IsRequired();
+        builder.Property(x => x.PickUpDateTo).IsRequired();
+        builder.Property(x => x.DeliveryDateTo).IsRequired();
         builder.Property(x => x.Price).IsRequired();
-        builder.Property(x => x.Discount).IsRequired();
+        builder.Property(x => x.OrderStatus).IsRequired();
 
         builder.Property(x => x.ExternalSystemId).IsRequired();
         builder.HasOne(x => x.ExternalSystem)
             .WithMany()
             .HasForeignKey(x => x.ExternalSystemId)
             .OnDelete(DeleteBehavior.Restrict);
-
-
 
         builder.Property(x => x.IsArchive).IsRequired();
         builder.Property(x => x.DateCreated).IsRequired();

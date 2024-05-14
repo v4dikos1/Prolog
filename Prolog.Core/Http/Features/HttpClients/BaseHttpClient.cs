@@ -98,6 +98,9 @@ namespace Prolog.Core.Http.Features.HttpClients
 
             await SetAuthorization();
             StringContent requestContent = Serialize(request);
+
+            var t = await requestContent.ReadAsStringAsync(cancellationToken);
+
             HttpResponseMessage response = await _httpClient.PostAsync(url, requestContent, cancellationToken);
             return await GetResult<TResponse>(response);
         }
@@ -271,7 +274,8 @@ namespace Prolog.Core.Http.Features.HttpClients
         protected virtual StringContent Serialize<TResponse>(IHttpRequest<TResponse> request)
         {
             Defend.Against.Default(request, nameof(request));
-            return new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
+            return new StringContent(JsonSerializer.Serialize(request, request.GetType()), Encoding.UTF8,
+                "application/json");
         }
 
         /// <summary>
