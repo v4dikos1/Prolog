@@ -1,4 +1,5 @@
 using System;
+using Prolog.Abstractions.CommonModels.PrologBotService;
 using Prolog.Application.Orders;
 using Prolog.Application.Orders.Dtos;
 using Prolog.Domain.Entities;
@@ -48,6 +49,23 @@ namespace Prolog.Application.Orders
                 Longitude = p4.Longitude,
                 Latitude = p4.Latitude,
                 StopType = p4.StopType
+            };
+        }
+        public OrderBotViewModel MapToBotViewModel(Order p5)
+        {
+            return p5 == null ? null : new OrderBotViewModel()
+            {
+                Id = p5.Id,
+                VisibleId = p5.Id.ToString("D8"),
+                ClientName = p5.Customer == null ? null : p5.Customer.Name,
+                ClientPhone = p5.Customer == null ? null : p5.Customer.PhoneNumber,
+                Address = p5.Address == null ? null : p5.Address.AddressFullName,
+                StorageName = p5.Storage == null ? null : p5.Storage.Name,
+                StorageAddress = p5.Storage == null ? null : (p5.Storage.Address == null ? null : p5.Storage.Address.AddressFullName),
+                PickUpStartDate = p5.PickUpDateFrom,
+                PickUpEndDate = p5.PickUpDateTo,
+                DeliveryStartDate = (DateTimeOffset?)p5.DeliveryDateFrom,
+                DeliveryEndDate = (DateTimeOffset?)p5.DeliveryDateTo
             };
         }
         

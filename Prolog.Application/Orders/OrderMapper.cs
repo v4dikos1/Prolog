@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using Prolog.Abstractions.CommonModels.PrologBotService;
 using Prolog.Application.Orders.Dtos;
 using Prolog.Domain.Entities;
 
@@ -9,6 +10,7 @@ public interface IOrderMapper
 {
     OrderListViewModel MapToViewModel(Order order);
     RouteViewModel MapToViewModel(ProblemSolution problemSolution);
+    OrderBotViewModel MapToBotViewModel(Order order);
 }
 
 internal class OrderMapRegister : IRegister
@@ -44,6 +46,19 @@ internal class OrderMapRegister : IRegister
             .Map(d => d.DeliveryEndDate, src => src.DeliveryDateTo)
             .Map(d => d.DateDelivered, src => src.DateDelivered)
             .Map(d => d.Status, src => src.OrderStatus);
+
+        config.NewConfig<Order, OrderBotViewModel>()
+            .Map(d => d.Id, src => src.Id)
+            .Map(d => d.VisibleId, src => src.Id.ToString("D8"))
+            .Map(d => d.Address, src => src.Address.AddressFullName)
+            .Map(d => d.ClientPhone, src => src.Customer.PhoneNumber)
+            .Map(d => d.ClientName, src => src.Customer.Name)
+            .Map(d => d.StorageName, src => src.Storage.Name)
+            .Map(d => d.StorageAddress, src => src.Storage.Address.AddressFullName)
+            .Map(d => d.PickUpStartDate, src => src.PickUpDateFrom)
+            .Map(d => d.PickUpEndDate, src => src.PickUpDateTo)
+            .Map(d => d.DeliveryStartDate, src => src.DeliveryDateFrom)
+            .Map(d => d.DeliveryEndDate, src => src.DeliveryDateTo);
 
         config.NewConfig<ProblemSolution, RouteViewModel>()
             .Map(d => d.Id, src => src.LocationId)
