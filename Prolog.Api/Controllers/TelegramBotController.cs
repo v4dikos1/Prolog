@@ -18,7 +18,7 @@ public class TelegramBotController(IPrologBotService prologBotService, ISender s
     [HttpPost]
     public async Task Update([FromBody] object request, CancellationToken cancellationToken)
     {
-        logger.LogInformation(request.ToString());
+        logger.LogError(request.ToString());
         var updateRequest = JsonConvert.DeserializeObject<Update>(request.ToString() ?? string.Empty);
         if (updateRequest != null)
         {
