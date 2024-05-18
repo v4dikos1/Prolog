@@ -81,6 +81,7 @@ try
     app.UseMiddleware<NLogRequestPostedBodyMiddleware>();
 
     app.MapControllers();
+    app.ListenBot();
 
     app.Run();
 }

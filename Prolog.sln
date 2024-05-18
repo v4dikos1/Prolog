@@ -3,21 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34511.84
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prolog.Domain", "Prolog.Domain\Prolog.Domain.csproj", "{45E6D5C4-E9ED-4CAC-B48D-C331C6E188D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prolog.Domain", "Prolog.Domain\Prolog.Domain.csproj", "{45E6D5C4-E9ED-4CAC-B48D-C331C6E188D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prolog.Abstractions", "Prolog.Abstractions\Prolog.Abstractions.csproj", "{40480162-F6E8-4FD4-AF8C-0FA6BDF9DAA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prolog.Abstractions", "Prolog.Abstractions\Prolog.Abstractions.csproj", "{40480162-F6E8-4FD4-AF8C-0FA6BDF9DAA4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prolog.Application", "Prolog.Application\Prolog.Application.csproj", "{2C3D3F8C-A599-4AEB-A338-7F0B065B5788}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prolog.Application", "Prolog.Application\Prolog.Application.csproj", "{2C3D3F8C-A599-4AEB-A338-7F0B065B5788}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prolog.Infrastructure", "Prolog.Infrastructure\Prolog.Infrastructure.csproj", "{023D9424-C1C1-4048-B8A7-9C1C8C103075}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prolog.Infrastructure", "Prolog.Infrastructure\Prolog.Infrastructure.csproj", "{023D9424-C1C1-4048-B8A7-9C1C8C103075}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prolog.Services", "Prolog.Services\Prolog.Services.csproj", "{E5042451-A765-4B08-B1B7-4A8D1E234A0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prolog.Services", "Prolog.Services\Prolog.Services.csproj", "{E5042451-A765-4B08-B1B7-4A8D1E234A0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prolog.Keycloak", "Prolog.Keycloak\Prolog.Keycloak.csproj", "{BFD5855F-073D-4FC9-8BD5-586E27732A07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prolog.Keycloak", "Prolog.Keycloak\Prolog.Keycloak.csproj", "{BFD5855F-073D-4FC9-8BD5-586E27732A07}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prolog.Api", "Prolog.Api\Prolog.Api.csproj", "{CFADDB2C-24CF-4B8F-BE46-A2AAFE38145D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prolog.Api", "Prolog.Api\Prolog.Api.csproj", "{CFADDB2C-24CF-4B8F-BE46-A2AAFE38145D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prolog.Core", "Prolog.Core\Prolog.Core.csproj", "{C20BDAB4-EEDA-44E7-9710-A983CEED91AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prolog.Core", "Prolog.Core\Prolog.Core.csproj", "{C20BDAB4-EEDA-44E7-9710-A983CEED91AB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{1372A2D9-FFAF-424E-A3CE-9732326B3BC0}"
 EndProject

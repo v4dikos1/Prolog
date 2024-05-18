@@ -17,7 +17,7 @@ namespace Prolog.Application.Orders.Handlers;
 internal class OrderCommandsHandler(ICurrentHttpContextAccessor contextAccessor, ApplicationDbContext dbContext,
     IExternalSystemService externalSystemService, IDaDataService daDataService, IAddressMapper addressMapper, IMapBoxService mapBoxService):
     IRequestHandler<CreateOrderCommand, CreatedOrUpdatedEntityViewModel<long>>, IRequestHandler<PlanOrdersCommand>,
-    IRequestHandler<RetrieveSolutionCommand>
+    IRequestHandler<RetrieveSolutionCommand>, IRequestHandler<CompleteOrderCommand>
 {
     public async Task<CreatedOrUpdatedEntityViewModel<long>> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
@@ -273,5 +273,17 @@ internal class OrderCommandsHandler(ICurrentHttpContextAccessor contextAccessor,
         var address = (await daDataService.GetListSuggestionAddressByQuery(queryModel)).FirstOrDefault();
         var result = addressMapper.MapToAddress(address);
         return result;
+    }
+
+    public async Task Handle(CompleteOrderCommand request, CancellationToken cancellationToken)
+    {
+        var orderToComplete = await dbContext.Orders
+            .Where(x => x.Id == request.OrderId)
+            .SingleOrDefaultAsync(cancellationToken)
+        ?? throw new ObjectNotFoundException($"Заявка с идентификатором {request.OrderId} не найдена!");
+
+        orderToComplete.OrderStatus = OrderStatusEnum.Completed;
+        orderToComplete.DateDelivered = DateTimeOffset.UtcNow;
+        await dbContext.SaveChangesAsync(cancellationToken);
     }
 }
