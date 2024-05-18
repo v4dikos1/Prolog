@@ -44,8 +44,15 @@ internal class PrologTelegramBotService: IPrologBotService, IDisposable
         }
 
         _botClient = new TelegramBotClient(accessToken);
-        await _botClient.SetWebhookAsync(hostUrl);
-
+        try
+        {
+            await _botClient.SetWebhookAsync(hostUrl);
+        }
+        catch (Exception ex)
+        {
+            
+        }
+        
         return _botClient;
     }
 
@@ -90,45 +97,48 @@ internal class PrologTelegramBotService: IPrologBotService, IDisposable
         var ordersModel = orders
             .Select(_orderMapper.MapToBotViewModel).ToList();
 
-        var messageBuilder = new StringBuilder();
-        var inlineKeyboardButtons = new List<InlineKeyboardButton>();
-
-        foreach (var order in ordersModel)
+        if (ordersModel.Any())
         {
-            var pickUpStartTime = order.PickUpStartDate.ToOffset(TimeSpan.FromHours(7)).ToString("HH:mm");
-            var pickUpEndTime = order.PickUpEndDate.ToOffset(TimeSpan.FromHours(7)).ToString("HH:mm");
-            var deliveryStartTime = order.DeliveryStartDate?.ToOffset(TimeSpan.FromHours(7)).ToString("HH:mm");
-            var deliveryEndTime = order.DeliveryEndDate?.ToOffset(TimeSpan.FromHours(7)).ToString("HH:mm");
+            var messageBuilder = new StringBuilder();
+            var inlineKeyboardButtons = new List<InlineKeyboardButton>();
 
-            messageBuilder.AppendLine($"*Заказ {order.VisibleId}*");
-            messageBuilder.AppendLine($"*Клиент:* {order.ClientName}");
-            messageBuilder.AppendLine($"*Телефон:* {order.ClientPhone}");
-            messageBuilder.AppendLine($"*Адрес:* {order.Address}");
-            messageBuilder.AppendLine($"*Склад:* {order.StorageName}");
-            messageBuilder.AppendLine($"*Адрес склада:* {order.StorageAddress}");
-            messageBuilder.AppendLine($"*Время забора:* {pickUpStartTime} - {pickUpEndTime}");
-            if (deliveryStartTime != null && deliveryEndTime != null)
+            foreach (var order in ordersModel)
             {
-                messageBuilder.AppendLine($"*Время доставки:* {deliveryStartTime} - {deliveryEndTime}");
+                var pickUpStartTime = order.PickUpStartDate.ToOffset(TimeSpan.FromHours(7)).ToString("HH:mm");
+                var pickUpEndTime = order.PickUpEndDate.ToOffset(TimeSpan.FromHours(7)).ToString("HH:mm");
+                var deliveryStartTime = order.DeliveryStartDate?.ToOffset(TimeSpan.FromHours(7)).ToString("HH:mm");
+                var deliveryEndTime = order.DeliveryEndDate?.ToOffset(TimeSpan.FromHours(7)).ToString("HH:mm");
+
+                messageBuilder.AppendLine($"*Заказ {order.VisibleId}*");
+                messageBuilder.AppendLine($"*Клиент:* {order.ClientName}");
+                messageBuilder.AppendLine($"*Телефон:* {order.ClientPhone}");
+                messageBuilder.AppendLine($"*Адрес:* {order.Address}");
+                messageBuilder.AppendLine($"*Склад:* {order.StorageName}");
+                messageBuilder.AppendLine($"*Адрес склада:* {order.StorageAddress}");
+                messageBuilder.AppendLine($"*Время забора:* {pickUpStartTime} - {pickUpEndTime}");
+                if (deliveryStartTime != null && deliveryEndTime != null)
+                {
+                    messageBuilder.AppendLine($"*Время доставки:* {deliveryStartTime} - {deliveryEndTime}");
+                }
+                messageBuilder.AppendLine();
+
+                inlineKeyboardButtons.Add(InlineKeyboardButton.WithCallbackData($"Заказ {order.VisibleId} доставлен", $"{order.Id}"));
             }
-            messageBuilder.AppendLine();
 
-            inlineKeyboardButtons.Add(InlineKeyboardButton.WithCallbackData($"Заказ {order.VisibleId} доставлен", $"{order.Id}"));
+            var tableButtons = new List<InlineKeyboardButton[]>();
+            for (var i = 0; i < inlineKeyboardButtons.Count; i += 2)
+            {
+                var row = inlineKeyboardButtons.Skip(i).Take(2).ToArray();
+                tableButtons.Add(row);
+            }
+
+            var inlineKeyboard = new InlineKeyboardMarkup(tableButtons.ToArray());
+            await client.SendTextMessageAsync(requestModel.Message!.Chat.Id,
+                messageBuilder.ToString(),
+                parseMode: ParseMode.Markdown,
+                replyMarkup: inlineKeyboard,
+                cancellationToken: cancellationToken);
         }
-
-        var tableButtons = new List<InlineKeyboardButton[]>();
-        for (var i = 0; i < inlineKeyboardButtons.Count; i += 2)
-        {
-            var row = inlineKeyboardButtons.Skip(i).Take(2).ToArray();
-            tableButtons.Add(row);
-        }
-
-        var inlineKeyboard = new InlineKeyboardMarkup(tableButtons.ToArray());
-        await client.SendTextMessageAsync(requestModel.Message!.Chat.Id,
-            messageBuilder.ToString(),
-            parseMode: ParseMode.Markdown,
-            replyMarkup: inlineKeyboard,
-            cancellationToken: cancellationToken);
     }
 
 
