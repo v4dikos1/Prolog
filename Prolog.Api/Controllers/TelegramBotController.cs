@@ -12,11 +12,13 @@ namespace Prolog.Api.Controllers;
 
 [AllowAnonymous]
 [Route("api/message/update")]
-public class TelegramBotController(IPrologBotService prologBotService, ISender sender): BaseController
+public class TelegramBotController(IPrologBotService prologBotService, ISender sender,
+    ILogger<TelegramBotController> logger): BaseController
 {
     [HttpPost]
     public async Task Update([FromBody] object request, CancellationToken cancellationToken)
     {
+        logger.LogInformation(request.ToString());
         var updateRequest = JsonConvert.DeserializeObject<Update>(request.ToString() ?? string.Empty);
         if (updateRequest != null)
         {
