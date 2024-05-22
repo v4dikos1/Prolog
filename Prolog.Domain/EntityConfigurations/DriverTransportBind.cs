@@ -24,6 +24,12 @@ internal class DriverTransportBind: IEntityTypeConfiguration<Entities.DriverTran
             .HasForeignKey(x => x.TransportId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.Property(x => x.StorageId).IsRequired();
+        builder.HasOne(x => x.Storage)
+            .WithMany()
+            .HasForeignKey(x => x.StorageId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.Property(x => x.StartDate).IsRequired();
         builder.Property(x => x.EndDate).IsRequired();
 

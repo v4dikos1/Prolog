@@ -10,6 +10,9 @@ public class DriverTransportBind: BaseEntity<Guid>, IHasTrackDateAttribute
     public Guid DriverId { get; set; }
     public Driver Driver { get; set; } = null!;
 
+    public Guid StorageId { get; set; }
+    public Storage Storage { get; set; } = null!;
+
     public DateTimeOffset StartDate { get; set; }
     public DateTimeOffset EndDate { get; set; }
 

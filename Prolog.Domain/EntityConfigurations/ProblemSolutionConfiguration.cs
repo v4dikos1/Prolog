@@ -15,6 +15,7 @@ internal class ProblemSolutionConfiguration: IEntityTypeConfiguration<ProblemSol
         builder.Property(x => x.LocationId)
             .IsRequired();
         builder.Property(x => x.StopType).IsRequired();
+        builder.Property(x => x.VehicleId).IsRequired();
         builder.Property(x => x.Index).IsRequired();
         builder.Property(x => x.Latitude).IsRequired();
         builder.Property(x => x.Longitude).IsRequired();

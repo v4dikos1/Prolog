@@ -3,6 +3,7 @@ using System;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Prolog.Domain;
@@ -13,9 +14,11 @@ using Prolog.Domain.Entities;
 namespace Prolog.Domain.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240522123352_AlterTable_DriverTransportBind_AddStorageIdField")]
+    partial class AlterTable_DriverTransportBind_AddStorageIdField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -478,10 +481,6 @@ namespace Prolog.Domain.Migrations
                     b.Property<int>("StopType")
                         .HasColumnType("integer")
                         .HasColumnName("stop_type");
-
-                    b.Property<Guid>("VehicleId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("vehicle_id");
 
                     b.HasKey("Id")
                         .HasName("pk_problem_solution");

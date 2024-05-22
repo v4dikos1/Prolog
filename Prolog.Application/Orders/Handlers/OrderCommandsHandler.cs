@@ -6,6 +6,8 @@ using Prolog.Abstractions.CommonModels.MapBoxService;
 using Prolog.Abstractions.Services;
 using Prolog.Application.Addresses.Mappers;
 using Prolog.Application.Orders.Commands;
+using Prolog.Application.Orders.Dtos;
+using Prolog.Core.EntityFramework.Extensions;
 using Prolog.Core.Exceptions;
 using Prolog.Domain;
 using Prolog.Domain.Entities;
@@ -17,7 +19,7 @@ namespace Prolog.Application.Orders.Handlers;
 internal class OrderCommandsHandler(ICurrentHttpContextAccessor contextAccessor, ApplicationDbContext dbContext,
     IExternalSystemService externalSystemService, IDaDataService daDataService, IAddressMapper addressMapper, IMapBoxService mapBoxService):
     IRequestHandler<CreateOrderCommand, CreatedOrUpdatedEntityViewModel<long>>, IRequestHandler<PlanOrdersCommand>,
-    IRequestHandler<RetrieveSolutionCommand>, IRequestHandler<CompleteOrderCommand>
+    IRequestHandler<RetrieveSolutionCommand>, IRequestHandler<CompleteOrderCommand>, IRequestHandler<ArchiveOrdersCommand>, IRequestHandler<CancelOrdersCommand>
 {
     public async Task<CreatedOrUpdatedEntityViewModel<long>> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
@@ -100,12 +102,18 @@ internal class OrderCommandsHandler(ICurrentHttpContextAccessor contextAccessor,
             Guid.Parse(contextAccessor.IdentityUserId!),
             cancellationToken)).IdentityId;
 
-        var existingStorage = await dbContext.Storages
-            .Where(x => x.Id == request.Body.StorageId)
+        var storageIds = request.Body.Binds.Select(x => x.StorageId).Distinct().ToList();
+        var existingStorages = await dbContext.Storages
+            .Where(x => storageIds.Contains(x.Id))
             .Where(x => x.ExternalSystemId == externalSystemId)
             .Where(x => !x.IsArchive)
-            .SingleOrDefaultAsync(cancellationToken)
-            ?? throw new ObjectNotFoundException($"Склад с идентификатором {request.Body.StorageId} не найден!");
+            .ToListAsync(cancellationToken);
+        var notFoundStorages = storageIds.Where(x => !existingStorages.Select(d => d.Id).Contains(x)).ToList();
+        if (notFoundStorages.Any())
+        {
+            throw new ObjectNotFoundException(
+                $"Не найдены склады с идентификаторами: {string.Join(", ", notFoundStorages)}!");
+        }
 
         var driverIds = request.Body.Binds.Select(x => x.DriverId).Distinct().ToList();
         var existingDrivers = await dbContext.Drivers
@@ -139,6 +147,7 @@ internal class OrderCommandsHandler(ICurrentHttpContextAccessor contextAccessor,
             .Where(x => x.ExternalSystemId == externalSystemId)
             .Where(x => x.OrderStatus == OrderStatusEnum.Incoming)
             .Where(x => startDate <= x.DeliveryDateFrom && endDate >= x.DeliveryDateTo)
+            .WhereIf(request.Body.OrderIds != null, x => request.Body.OrderIds!.Contains(x.Id))
             .ToListAsync(cancellationToken);
 
         var problemRequest = new SubmitProblemRequest
@@ -151,13 +160,29 @@ internal class OrderCommandsHandler(ICurrentHttpContextAccessor contextAccessor,
             Shipments = ordersToPlan.Select(x => new ShipmentModel
             {
                 Name = x.Id.ToString(),
-                From = existingStorage.Id.ToString(),
+                From = x.StorageId.ToString(),
                 To = x.Id.ToString(),
                 Size = new ShipmentSizeModel
                 {
                     Boxes = x.Items.Sum(i => i.Count),
                     Volume = (long)x.Items.Sum(i => i.Volume),
                     Weight = (long)x.Items.Sum(i => i.Weight)
+                },
+                PickUpTimes = new List<PickUpTimeModel>
+                {
+                    new()
+                    {
+                        Earliest = x.PickUpDateFrom,
+                        Latest = x.PickUpDateTo
+                    }
+                },
+                DropOffTimes = new List<DropOffTimeModel>
+                {
+                    new()
+                    {
+                        Earliest = x.DeliveryDateFrom,
+                        Latest = x.DeliveryDateTo
+                    }
                 }
             }).ToList(),
             Vehicles = existingTransports.Select(x => new VehicleModel
@@ -173,20 +198,23 @@ internal class OrderCommandsHandler(ICurrentHttpContextAccessor contextAccessor,
                 LatestEnd = request.Body.EndDate.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'")
             }).ToList()
         };
-        problemRequest.Locations.Add(new LocationModel
-        {
-            Name = existingStorage.Id.ToString(),
-            Coordinates = existingStorage.Coordinates.Split(' ').Reverse()
-                .Select(c => double.Parse(c, CultureInfo.InvariantCulture)).ToList()
-        });
 
+        foreach (var existingStorage in existingStorages)
+        {
+            problemRequest.Locations.Add(new LocationModel
+            {
+                Name = existingStorage.Id.ToString(),
+                Coordinates = existingStorage.Coordinates.Split(' ').Reverse()
+                    .Select(c => double.Parse(c, CultureInfo.InvariantCulture)).ToList()
+            });
+        }
+        
         var problem = await mapBoxService.SubmitProblemAsync(problemRequest, cancellationToken);
 
         foreach (var order in ordersToPlan)
         {
             order.OrderStatus = OrderStatusEnum.Active;
             order.ProblemId = problem.Id;
-            order.StorageId = existingStorage.Id;
         }
 
         var bindsToCreate = new List<DriverTransportBind>();
@@ -197,6 +225,7 @@ internal class OrderCommandsHandler(ICurrentHttpContextAccessor contextAccessor,
                 DriverId = bind.DriverId,
                 TransportId = bind.TransportId,
                 ProblemId = problem.Id,
+                StorageId = bind.StorageId,
                 StartDate = request.Body.StartDate.ToUniversalTime(),
                 EndDate = request.Body.EndDate.ToUniversalTime()
             };
@@ -224,21 +253,26 @@ internal class OrderCommandsHandler(ICurrentHttpContextAccessor contextAccessor,
                 await mapBoxService.RetrieveSolutionAsync(new RetrieveSolutionRequest { Id = problemId }, cancellationToken);
             solutionLists.Add(solution);
 
-            var index = 0;
-            foreach (var stop in solution.Routes.SelectMany(x => x.Stops))
+            foreach (var solutionRoute in solution.Routes)
             {
-                var problemSolution = new ProblemSolution
+                var index = 0;
+                foreach (var stop in solutionRoute.Stops)
                 {
-                    ProblemId = problemId,
-                    LocationId = stop.LocationId,
-                    Index = index,
-                    StopType = stop.Type == "pickup" ? StopTypeEnum.Storage : StopTypeEnum.Client,
-                    Latitude = stop.LocationMetadata.Coordinates[1].ToString(CultureInfo.InvariantCulture),
-                    Longitude = stop.LocationMetadata.Coordinates[0].ToString(CultureInfo.InvariantCulture)
-                };
-                index += 1;
-                problemSolutionsToCreate.Add(problemSolution);
+                    var problemSolution = new ProblemSolution
+                    {
+                        VehicleId = solutionRoute.VehicleId,
+                        ProblemId = problemId,
+                        LocationId = stop.LocationId,
+                        Index = index,
+                        StopType = stop.Type == "pickup" ? StopTypeEnum.Storage : StopTypeEnum.Client,
+                        Latitude = stop.LocationMetadata.Coordinates[1].ToString(CultureInfo.InvariantCulture),
+                        Longitude = stop.LocationMetadata.Coordinates[0].ToString(CultureInfo.InvariantCulture)
+                    };
+                    index += 1;
+                    problemSolutionsToCreate.Add(problemSolution);
+                }
             }
+            
         }
         await dbContext.AddRangeAsync(problemSolutionsToCreate, cancellationToken);
 
@@ -285,5 +319,150 @@ internal class OrderCommandsHandler(ICurrentHttpContextAccessor contextAccessor,
         orderToComplete.OrderStatus = OrderStatusEnum.Completed;
         orderToComplete.DateDelivered = DateTimeOffset.UtcNow;
         await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task Handle(ArchiveOrdersCommand request, CancellationToken cancellationToken)
+    {
+        var ordersToArchive = await dbContext.Orders
+            .Where(x => !x.IsArchive)
+            .Where(x => request.OrderIds.Contains(x.Id))
+            .ToListAsync(cancellationToken);
+
+        var problemIds = ordersToArchive
+            .Where(x => x.ProblemId.HasValue)
+            .Select(x => x.ProblemId!.Value)
+            .Distinct().ToList();
+
+        var ordersToPlanList = await dbContext.Orders
+            .Where(x => x.OrderStatus == OrderStatusEnum.Planned)
+            .Where(x => x.ProblemId.HasValue && problemIds.Contains(x.ProblemId.Value))
+            .Where(x => !request.OrderIds.Contains(x.Id))
+            .ToListAsync(cancellationToken);
+
+        var ordersToPlanGroupedByProblem = ordersToPlanList.GroupBy(x => x.ProblemId!.Value)
+            .ToDictionary(key => key.Key, value => value.Select(x => x));
+        var driverTransportBinds = await dbContext.DriverTransportBinds
+            .Where(x => problemIds.Contains(x.ProblemId))
+            .GroupBy(key => key.ProblemId)
+            .ToDictionaryAsync(key => key.Key, 
+                value => value.Select(x => x),
+                cancellationToken);
+
+        var commandsToSend = new List<PlanOrdersCommand>();
+        foreach (var problemId in ordersToPlanGroupedByProblem.Keys)
+        {
+            var orders = ordersToPlanList.Where(x => x.ProblemId.HasValue && x.ProblemId!.Value == problemId);
+            var ordersToPlanIds = orders.Select(x => x.Id).ToList();
+            var binds = driverTransportBinds[problemId].Select(x => new DriverTransportBindModel
+            {
+                StorageId = x.StorageId,
+                DriverId = x.DriverId,
+                TransportId = x.TransportId
+            });
+            var planOrdersCommand = new PlanOrdersCommand
+            {
+                Body = new PlanOrdersModel
+                {
+                    Binds = binds,
+                    OrderIds = ordersToPlanIds,
+                    EndDate = driverTransportBinds[problemId].First().EndDate,
+                    StartDate = driverTransportBinds[problemId].First().StartDate
+                }
+            };
+            commandsToSend.Add(planOrdersCommand);
+        }
+
+        foreach (var order in ordersToPlanList)
+        {
+            order.ProblemId = null;
+            order.OrderStatus = OrderStatusEnum.Incoming;
+            order.DriverTransportBindId = null;
+        }
+
+        foreach (var order in ordersToArchive)
+        {
+            order.IsArchive = true;
+        }
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        foreach (var command in commandsToSend)
+        {
+            await Handle(command, cancellationToken);
+        }
+    }
+
+    public async Task Handle(CancelOrdersCommand request, CancellationToken cancellationToken)
+    {
+        var ordersToCancel = await dbContext.Orders
+            .Where(x => !x.IsArchive)
+            .Where(x => request.OrderIds.Contains(x.Id))
+            .Where(x => x.OrderStatus == OrderStatusEnum.Planned)
+            .ToListAsync(cancellationToken);
+
+        var problemIds = ordersToCancel
+            .Where(x => x.ProblemId.HasValue)
+            .Select(x => x.ProblemId!.Value)
+            .Distinct().ToList();
+
+        var ordersToPlan = await dbContext.Orders
+            .Where(x => x.OrderStatus == OrderStatusEnum.Planned)
+            .Where(x => x.ProblemId.HasValue && problemIds.Contains(x.ProblemId.Value))
+            .Where(x => !request.OrderIds.Contains(x.Id))
+            .ToListAsync(cancellationToken);
+
+        var ordersToPlanGroupedByProblem = ordersToPlan.GroupBy(x => x.ProblemId!.Value)
+            .ToDictionary(key => key.Key, value => value.Select(x => x));
+        var driverTransportBinds = await dbContext.DriverTransportBinds
+            .Where(x => problemIds.Contains(x.ProblemId))
+            .GroupBy(key => key.ProblemId)
+            .ToDictionaryAsync(key => key.Key,
+                value => value.Select(x => x),
+                cancellationToken);
+
+        var commandsToSend = new List<PlanOrdersCommand>();
+        foreach (var problemId in ordersToPlanGroupedByProblem.Keys)
+        {
+            var orders = ordersToPlan.Where(x => x.ProblemId!.Value == problemId);
+            var ordersToPlanIds = orders.Select(x => x.Id).ToList();
+            var binds = driverTransportBinds[problemId].Select(x => new DriverTransportBindModel
+            {
+                StorageId = x.StorageId,
+                DriverId = x.DriverId,
+                TransportId = x.TransportId
+            });
+            var planOrdersCommand = new PlanOrdersCommand
+            {
+                Body = new PlanOrdersModel
+                {
+                    Binds = binds,
+                    OrderIds = ordersToPlanIds,
+                    EndDate = driverTransportBinds[problemId].First().EndDate,
+                    StartDate = driverTransportBinds[problemId].First().StartDate
+                }
+            };
+            commandsToSend.Add(planOrdersCommand);
+        }
+
+        foreach (var order in ordersToPlan)
+        {
+            order.ProblemId = null;
+            order.OrderStatus = OrderStatusEnum.Incoming;
+            order.DriverTransportBindId = null;
+        }
+
+        foreach (var order in ordersToCancel)
+        {
+            order.ProblemId = null;
+            order.DriverTransportBindId = null;
+            order.OrderStatus = OrderStatusEnum.Incoming;
+        }
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        foreach (var command in commandsToSend)
+        {
+            await Handle(command, cancellationToken);
+        }
     }
 }

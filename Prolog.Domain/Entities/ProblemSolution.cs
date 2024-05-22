@@ -12,6 +12,8 @@ public class ProblemSolution: BaseEntity<Guid>, IHasTrackDateAttribute
     /// </summary>
     public string LocationId { get; set; } = string.Empty;
 
+    public Guid VehicleId { get; set; }
+
     public StopTypeEnum StopType { get; set; }
 
     public int Index { get; set; }

@@ -24,6 +24,7 @@ internal class OrdersQueriesHandler(ApplicationDbContext dbContext, ICurrentHttp
 
         var orders = await dbContext.Orders
             .AsNoTracking()
+            .Where(x => !x.IsArchive)
             .Include(x => x.Items)
             .Include(x => x.Customer)
             .Include(x => x.Storage)
@@ -63,7 +64,8 @@ internal class OrdersQueriesHandler(ApplicationDbContext dbContext, ICurrentHttp
             foreach (var orderGroupByDriver in ordersGroupedByDriver)
             {
                 var ordersProblemIds = orderGroupByDriver.Value.Where(x => x.ProblemId.HasValue).Select(x => x.ProblemId).Distinct();
-                var problems = problemSolutions.Where(x => ordersProblemIds.Contains(x.ProblemId)).ToList();
+                var problems = problemSolutions.Where(x => ordersProblemIds.Contains(x.ProblemId)
+                                                           && driversDictionary[orderGroupByDriver.Key]!.TransportId == x.VehicleId).ToList();
                 var orderGroupedByDriver = new OrderListGroupedByDriverViewModel
                 {
                     Driver = orderGroupByDriver.Key != Guid.Empty ? 

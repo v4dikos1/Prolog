@@ -14,4 +14,9 @@ public class DriverTransportBindModel
     /// Идентификатор транспорта
     /// </summary>
     public required Guid TransportId { get; set; }
+
+    /// <summary>
+    /// Идентификатор склада
+    /// </summary>
+    public required Guid StorageId { get; set; }
 }

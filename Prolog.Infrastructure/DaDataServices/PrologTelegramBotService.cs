@@ -4,6 +4,7 @@ using Prolog.Abstractions.Enums;
 using Prolog.Abstractions.Services;
 using Prolog.Application.Orders;
 using Prolog.Domain;
+using Prolog.Domain.Entities;
 using Prolog.Domain.Enums;
 using System.Text;
 using Telegram.Bot;
@@ -128,7 +129,7 @@ internal class PrologTelegramBotService: IPrologBotService, IDisposable
             var tableButtons = new List<InlineKeyboardButton[]>();
             for (var i = 0; i < inlineKeyboardButtons.Count; i += 2)
             {
-                var row = inlineKeyboardButtons.Skip(i).Take(2).ToArray();
+                var row = inlineKeyboardButtons.Skip(i).Take(1).ToArray();
                 tableButtons.Add(row);
             }
 
@@ -139,6 +140,37 @@ internal class PrologTelegramBotService: IPrologBotService, IDisposable
                 replyMarkup: inlineKeyboard,
                 cancellationToken: cancellationToken);
         }
+        else
+        {
+            await client.SendTextMessageAsync(requestModel.Message!.Chat.Id,
+                "Активных заявок на данный момент нет!", cancellationToken: cancellationToken);
+        }
+    }
+
+    public async Task GetProfileAsync(Update requestModel, CancellationToken cancellationToken)
+    {
+        var client = await GetBot();
+
+        var driver = await _dbContext.Drivers
+            .Where(x => x.Telegram == requestModel.Message!.Chat.Username)
+            .SingleOrDefaultAsync(cancellationToken);
+
+        if (driver == null)
+        {
+            await client.SendTextMessageAsync(requestModel.Message!.Chat.Id,
+                "Вы не зарегистрированы в качестве водителя в системе Prolog! Обратитесь к администратору системы для уточнения вопросов.",
+                cancellationToken: cancellationToken);
+            return;
+        }
+
+        var messageBuilder = new StringBuilder();
+        messageBuilder.AppendLine($"{driver.Name} {driver.Surname} {driver.Patronymic}");
+        messageBuilder.AppendLine($"*Номер телефона:* {driver.PhoneNumber}");
+        messageBuilder.AppendLine($"*Оклад:* {driver.Salary}");
+        await client.SendTextMessageAsync(requestModel.Message!.Chat.Id,
+            messageBuilder.ToString(),
+            parseMode: ParseMode.Markdown,
+            cancellationToken: cancellationToken);
     }
 
 

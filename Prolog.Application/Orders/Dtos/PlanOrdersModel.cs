@@ -20,8 +20,5 @@ public class PlanOrdersModel
     /// </summary>
     public required IEnumerable<DriverTransportBindModel> Binds { get; set; }
 
-    /// <summary>
-    /// Идентификатор склада
-    /// </summary>
-    public required Guid StorageId { get; set; }
+    public IEnumerable<long>? OrderIds { get; set; }
 }

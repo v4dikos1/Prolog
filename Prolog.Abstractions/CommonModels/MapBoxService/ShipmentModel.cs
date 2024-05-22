@@ -30,4 +30,10 @@ public class ShipmentModel
     /// </summary>
     [JsonPropertyName("size")]
     public required ShipmentSizeModel Size { get; set; }
+
+    [JsonPropertyName("pickup_times")]
+    public required IEnumerable<PickUpTimeModel> PickUpTimes { get; set; }
+
+    [JsonPropertyName("dropoff_times")]
+    public required IEnumerable<DropOffTimeModel> DropOffTimes { get; set; }
 }
