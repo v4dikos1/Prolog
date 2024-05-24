@@ -249,35 +249,43 @@ internal class OrderCommandsHandler(ICurrentHttpContextAccessor contextAccessor,
         var problemSolutionsToCreate = new List<ProblemSolution>();
         foreach (var problemId in problemIds)
         {
-            var solution =
-                await mapBoxService.RetrieveSolutionAsync(new RetrieveSolutionRequest { Id = problemId }, cancellationToken);
-            solutionLists.Add(solution);
-
-            foreach (var solutionRoute in solution.Routes)
+            try
             {
-                var index = 0;
-                foreach (var stop in solutionRoute.Stops)
+                var solution =
+                    await mapBoxService.RetrieveSolutionAsync(new RetrieveSolutionRequest { Id = problemId }, cancellationToken);
+                solutionLists.Add(solution);
+
+                foreach (var solutionRoute in solution.Routes)
                 {
-                    var problemSolution = new ProblemSolution
+                    var index = 0;
+                    foreach (var stop in solutionRoute.Stops)
                     {
-                        VehicleId = solutionRoute.VehicleId,
-                        ProblemId = problemId,
-                        LocationId = stop.LocationId,
-                        Index = index,
-                        StopType = stop.Type == "pickup" ? StopTypeEnum.Storage : StopTypeEnum.Client,
-                        Latitude = stop.LocationMetadata.Coordinates[1].ToString(CultureInfo.InvariantCulture),
-                        Longitude = stop.LocationMetadata.Coordinates[0].ToString(CultureInfo.InvariantCulture)
-                    };
-                    index += 1;
-                    problemSolutionsToCreate.Add(problemSolution);
+                        var problemSolution = new ProblemSolution
+                        {
+                            VehicleId = solutionRoute.VehicleId,
+                            ProblemId = problemId,
+                            LocationId = stop.LocationId,
+                            Index = index,
+                            StopType = stop.Type == "pickup" ? StopTypeEnum.Storage : StopTypeEnum.Client,
+                            Latitude = stop.LocationMetadata.Coordinates[1].ToString(CultureInfo.InvariantCulture),
+                            Longitude = stop.LocationMetadata.Coordinates[0].ToString(CultureInfo.InvariantCulture)
+                        };
+                        index += 1;
+                        problemSolutionsToCreate.Add(problemSolution);
+                    }
                 }
             }
-            
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
         await dbContext.AddRangeAsync(problemSolutionsToCreate, cancellationToken);
 
-        var solutionDictionary = solutionLists.SelectMany(x => x.Routes)
-            .ToDictionary(key => key.VehicleId, value => value.Stops.Select(x => x.LocationId).ToList());
+        var routes = solutionLists.SelectMany(x => x.Routes);
+        var solutionDictionary = routes
+            .GroupBy(key => key.VehicleId)
+            .ToDictionary(key => key.Key, value => value.SelectMany(x => x.Stops).Select(x => x.LocationId).ToList());
 
         var driverTransportBinds = await dbContext.DriverTransportBinds
             .Where(x => problemIds.Contains(x.ProblemId))
@@ -287,7 +295,7 @@ internal class OrderCommandsHandler(ICurrentHttpContextAccessor contextAccessor,
         {
             order.OrderStatus = OrderStatusEnum.Planned;
             var vehicleId = solutionDictionary.Single(x => x.Value.Contains(order.Id.ToString())).Key;
-            var bind = driverTransportBinds.Single(x => x.TransportId == vehicleId);
+            var bind = driverTransportBinds.Single(x => x.TransportId == vehicleId && x.ProblemId == order.ProblemId);
             order.DriverTransportBindId = bind.Id;
         }
 
