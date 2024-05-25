@@ -1,6 +1,8 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Prolog.Abstractions.CommonModels;
+using Prolog.Abstractions.CommonModels.DaDataService;
 using Prolog.Abstractions.CommonModels.DaDataService.Models.Query;
 using Prolog.Abstractions.CommonModels.MapBoxService;
 using Prolog.Abstractions.Services;
@@ -17,7 +19,7 @@ using System.Globalization;
 namespace Prolog.Application.Orders.Handlers;
 
 internal class OrderCommandsHandler(ICurrentHttpContextAccessor contextAccessor, ApplicationDbContext dbContext,
-    IExternalSystemService externalSystemService, IDaDataService daDataService, IAddressMapper addressMapper, IMapBoxService mapBoxService):
+    IExternalSystemService externalSystemService, IDaDataService daDataService, IAddressMapper addressMapper, IMapBoxService mapBoxService, ILogger<OrderCommandsHandler> logger):
     IRequestHandler<CreateOrderCommand, CreatedOrUpdatedEntityViewModel<long>>, IRequestHandler<PlanOrdersCommand>,
     IRequestHandler<RetrieveSolutionCommand>, IRequestHandler<CompleteOrderCommand>, IRequestHandler<ArchiveOrdersCommand>, IRequestHandler<CancelOrdersCommand>
 {
@@ -58,7 +60,15 @@ internal class OrderCommandsHandler(ICurrentHttpContextAccessor contextAccessor,
         }
 
         var address = await GetAddress(request.Body.Address);
-        var coordinates = await daDataService.GetCoordinatesByAddress(address.AddressFullName);
+        var coordinates = new CoordinatesResponseModel();
+        try
+        {
+            coordinates = await daDataService.GetCoordinatesByAddress(address.AddressFullName);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.Message, ex.InnerException);
+        }
 
         var orderToCreate = new Order
         {
