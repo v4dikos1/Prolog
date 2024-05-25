@@ -16,35 +16,31 @@ namespace Prolog.Application.Storages
                 Coordinates = string.Empty
             };
         }
-        public Storage MapExisted(CreateStorageModel p2, Storage p3)
+        public Storage MapExisted(ValueTuple<CreateStorageModel, Storage> p2)
         {
-            if (p2 == null)
+            return new Storage()
             {
-                return null;
-            }
-            Storage result = p3 ?? new Storage();
-            
-            result.Name = p2.Name;
-            result.Address = p2.Address == null ? null : (Address)Convert.ChangeType((object)p2.Address, typeof(Address));
-            return result;
-            
+                ExternalSystemId = p2.Item2.ExternalSystemId,
+                Name = p2.Item1.Name,
+                Coordinates = string.Empty
+            };
         }
-        public StorageListViewModel MapToListViewModel(Storage p4)
+        public StorageListViewModel MapToListViewModel(Storage p3)
         {
-            return p4 == null ? null : new StorageListViewModel()
+            return p3 == null ? null : new StorageListViewModel()
+            {
+                Id = p3.Id,
+                Name = p3.Name,
+                Address = p3.Address == null ? null : p3.Address.AddressFullName
+            };
+        }
+        public StorageViewModel MapToViewModel(Storage p4)
+        {
+            return p4 == null ? null : new StorageViewModel()
             {
                 Id = p4.Id,
                 Name = p4.Name,
                 Address = p4.Address == null ? null : p4.Address.AddressFullName
-            };
-        }
-        public StorageViewModel MapToViewModel(Storage p5)
-        {
-            return p5 == null ? null : new StorageViewModel()
-            {
-                Id = p5.Id,
-                Name = p5.Name,
-                Address = p5.Address == null ? null : p5.Address.AddressFullName
             };
         }
     }

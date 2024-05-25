@@ -45,7 +45,7 @@ internal class StorageCommandsHandler(ApplicationDbContext dbContext, ICurrentHt
         storageToUpdate.Address = storageAddress;
         var coordinates = await daDataService.GetCoordinatesByAddress(storageAddress.AddressFullName);
         storageToUpdate.Coordinates = string.Join(" ", coordinates.Latitude, coordinates.Longitude);
-        var updatedStorage = storageMapper.MapExisted(request.Body, storageToUpdate);
+        var updatedStorage = storageMapper.MapExisted((request.Body, storageToUpdate));
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 

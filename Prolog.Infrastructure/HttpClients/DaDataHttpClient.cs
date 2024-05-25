@@ -21,7 +21,7 @@ public class DaDataHttpClient : IDisposable
 
         _addressHttpClient = new HttpClient();
         _addressHttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", apiKey);
-        _addressHttpClient.DefaultRequestHeaders.Add("X-Secret", "9d8e3749736f99219c48a4d4ee3e3af1ed719cb1");
+        _addressHttpClient.DefaultRequestHeaders.Add("X-Secret", "6b4b874d4d8f250cfc5f4f5ae87247b4b5c47d0a");
         _addressHttpClient.BaseAddress = new Uri("https://cleaner.dadata.ru");
         _addressHttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
     }
