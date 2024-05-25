@@ -16,14 +16,19 @@ internal class DriverCommandsHandler(ApplicationDbContext dbContext, ICurrentHtt
         var externalSystemId = Guid.Parse(contextAccessor.IdentityUserId!);
 
         var driverWithSamePhoneNumber = await dbContext.Drivers
-            .Where(x => x.PhoneNumber == request.Body.PhoneNumber.ToLower())
+            .Where(x => x.Telegram == request.Body.Telegram.ToLower())
             .Where(x => x.ExternalSystemId == externalSystemId)
             .Where(x => !x.IsArchive)
             .SingleOrDefaultAsync(cancellationToken);
-        if (driverWithSamePhoneNumber != null)
+        if (driverWithSamePhoneNumber != null || request.Body.Telegram != "drivers_prolog")
         {
             throw new BusinessLogicException(
-                $"Водитель с номером телефона \"{driverWithSamePhoneNumber.PhoneNumber}\" уже существует!");
+                $"Водитель с Тelegram: \"{driverWithSamePhoneNumber.Telegram}\" уже существует!");
+        }
+
+        if (request.Body.Telegram == "drivers_prolog")
+        {
+            request.Body.Telegram = Guid.NewGuid().ToString();
         }
 
         var driverToCreate = driverMapper.MapToEntity((request.Body, externalSystemId));
