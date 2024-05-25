@@ -1,4 +1,5 @@
-﻿using Prolog.Abstractions.CommonModels.DaDataService;
+﻿using Microsoft.Extensions.Logging;
+using Prolog.Abstractions.CommonModels.DaDataService;
 using Prolog.Abstractions.CommonModels.DaDataService.Models.Query;
 using Prolog.Abstractions.CommonModels.DaDataService.Models.Response;
 using System.Net;
@@ -10,11 +11,13 @@ namespace Prolog.Infrastructure.HttpClients;
 
 public class DaDataHttpClient : IDisposable
 {
+    private readonly ILogger<DaDataHttpClient> _logger;
     private readonly HttpClient _httpClient;
     private readonly HttpClient _addressHttpClient;
 
-    public DaDataHttpClient(string apiKey, string baseUrl)
+    public DaDataHttpClient(string apiKey, string baseUrl, ILogger<DaDataHttpClient> logger)
     {
+        _logger = logger;
         _httpClient = new HttpClient();
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", apiKey);
         _httpClient.BaseAddress = new Uri(baseUrl);
@@ -60,7 +63,9 @@ public class DaDataHttpClient : IDisposable
 
         if (response.StatusCode != HttpStatusCode.OK)
         {
-            Console.WriteLine(response.Content);
+            _logger.LogError(jsonString);
+            _logger.LogError(response.Content.ToString());
+            throw new ApplicationException($"Ошибка во время запроса в DaData: {response.Content}");
         }
 
         var result = await response.Content.ReadAsStringAsync();
