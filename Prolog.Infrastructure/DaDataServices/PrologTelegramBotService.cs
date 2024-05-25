@@ -90,6 +90,7 @@ internal class PrologTelegramBotService: IPrologBotService, IDisposable
             .Include(x => x.Customer)
             .Include(x => x.Storage)
             .Where(x => !x.IsArchive)
+            .Where(x => x.PickUpDateFrom.Date == DateTime.Now.Date)
             .Where(x => x.OrderStatus == OrderStatusEnum.Planned)
             .Where(x => x.DriverTransportBind!.Driver.Telegram == requestModel.Message!.Chat.Username)
             .OrderBy(x => x.DeliveryDateFrom)
