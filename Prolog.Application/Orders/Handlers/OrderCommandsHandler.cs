@@ -152,10 +152,12 @@ internal class OrderCommandsHandler(ICurrentHttpContextAccessor contextAccessor,
         var startDate = request.Body.StartDate.ToUniversalTime();
         var endDate = request.Body.EndDate.ToUniversalTime();
 
+        var existingStoragesIds = existingStorages.Select(x => x.Id).ToList();
         var ordersToPlan = await dbContext.Orders
             .Include(order => order.Items)
             .Where(x => x.ExternalSystemId == externalSystemId)
             .Where(x => x.OrderStatus == OrderStatusEnum.Incoming)
+            .Where(x => existingStoragesIds.Contains(x.StorageId))
             .Where(x => startDate <= x.DeliveryDateFrom && endDate >= x.DeliveryDateTo)
             .WhereIf(request.Body.OrderIds != null, x => request.Body.OrderIds!.Contains(x.Id))
             .ToListAsync(cancellationToken);
