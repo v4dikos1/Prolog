@@ -37,9 +37,9 @@ internal class OrderMapRegister : IRegister
                     StorageName = src.Storage.Name
                 })
             .Map(d => d.Price, src => src.Price)
-            .Map(d => d.Volume, src => 0)
-            .Map(d => d.Weight, src => 0)
-            .Map(d => d.Amount, src => 0)
+            .Map(d => d.Volume, src => src.Items.Sum(i => i.Volume))
+            .Map(d => d.Weight, src => src.Items.Sum(i => i.Weight))
+            .Map(d => d.Amount, src => src.Items.Sum(i => i.Count))
             .Map(d => d.PickUpStartDate, src => src.PickUpDateFrom)
             .Map(d => d.PickUpEndDate, src => src.PickUpDateTo)
             .Map(d => d.DeliveryStartDate, src => src.DeliveryDateFrom)
