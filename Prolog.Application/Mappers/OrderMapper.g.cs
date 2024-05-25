@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Prolog.Abstractions.CommonModels.PrologBotService;
 using Prolog.Application.Orders;
 using Prolog.Application.Orders.Dtos;
@@ -29,9 +30,9 @@ namespace Prolog.Application.Orders
                     StorageName = p1.Storage.Name
                 }),
                 Price = p1.Price,
-                Volume = (decimal)0,
-                Weight = (decimal)0,
-                Amount = 0,
+                Volume = p1.Items.Sum<OrderItem>(funcMain3),
+                Weight = p1.Items.Sum<OrderItem>(funcMain4),
+                Amount = (int)p1.Items.Sum<OrderItem>(funcMain5),
                 PickUpStartDate = p1.PickUpDateFrom,
                 PickUpEndDate = p1.PickUpDateTo,
                 DeliveryStartDate = (DateTimeOffset?)p1.DeliveryDateFrom,
@@ -89,6 +90,21 @@ namespace Prolog.Application.Orders
                 StorageCoordinates = p3.StorageCoordinates,
                 StorageName = p3.StorageName
             };
+        }
+        
+        private decimal funcMain3(OrderItem i)
+        {
+            return i.Volume;
+        }
+        
+        private decimal funcMain4(OrderItem i)
+        {
+            return i.Weight;
+        }
+        
+        private long funcMain5(OrderItem i)
+        {
+            return i.Count;
         }
     }
 }
