@@ -287,7 +287,7 @@ internal class OrderCommandsHandler(ICurrentHttpContextAccessor contextAccessor,
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                logger.LogError(e.Message, e.Message);
             }
         }
         await dbContext.AddRangeAsync(problemSolutionsToCreate, cancellationToken);
@@ -303,10 +303,18 @@ internal class OrderCommandsHandler(ICurrentHttpContextAccessor contextAccessor,
 
         foreach (var order in ordersToRetrieve)
         {
-            order.OrderStatus = OrderStatusEnum.Planned;
-            var vehicleId = solutionDictionary.Single(x => x.Value.Contains(order.Id.ToString())).Key;
-            var bind = driverTransportBinds.Single(x => x.TransportId == vehicleId && x.ProblemId == order.ProblemId);
-            order.DriverTransportBindId = bind.Id;
+            var vehicleId = solutionDictionary.SingleOrDefault(x => x.Value.Contains(order.Id.ToString())).Key;
+            if (vehicleId != Guid.Empty)
+            {
+                order.OrderStatus = OrderStatusEnum.Planned;
+                var bind = driverTransportBinds.Single(x => x.TransportId == vehicleId && x.ProblemId == order.ProblemId);
+                order.DriverTransportBindId = bind.Id;
+            }
+            else
+            {
+                order.OrderStatus = OrderStatusEnum.Incoming;
+                order.ProblemId = null;
+            }
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
