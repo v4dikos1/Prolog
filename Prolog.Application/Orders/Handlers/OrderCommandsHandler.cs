@@ -303,11 +303,12 @@ internal class OrderCommandsHandler(ICurrentHttpContextAccessor contextAccessor,
 
         foreach (var order in ordersToRetrieve)
         {
-            var vehicleId = solutionDictionary.SingleOrDefault(x => x.Value.Contains(order.Id.ToString())).Key;
-            if (vehicleId != Guid.Empty)
+            var solution = solutionDictionary.SingleOrDefault(x => x.Value.Contains(order.Id.ToString()));
+            if (solution.Key != Guid.Empty)
             {
                 order.OrderStatus = OrderStatusEnum.Planned;
-                var bind = driverTransportBinds.Single(x => x.TransportId == vehicleId && x.ProblemId == order.ProblemId);
+                var bind = driverTransportBinds.Single(x => x.TransportId == solution.Key && x.ProblemId == order.ProblemId);
+                bind.TotalOrdersCount += 1;
                 order.DriverTransportBindId = bind.Id;
             }
             else
