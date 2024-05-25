@@ -30,7 +30,9 @@ public class DaDataService(IConfiguration configuration) : IDaDataService
     public async Task<CoordinatesResponseModel> GetCoordinatesByAddress(string address)
     {
         using var client = new DaDataHttpClient(_apiKey, _daDataServiceUrl);
-        var coordinates = await client.GetCoordinatesByAddress(address);
-        return coordinates;
+        {
+            var coordinates = await client.GetCoordinatesByAddress(address);
+            return coordinates;
+        }
     }
 }

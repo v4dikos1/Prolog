@@ -1,6 +1,7 @@
 ﻿using Prolog.Abstractions.CommonModels.DaDataService;
 using Prolog.Abstractions.CommonModels.DaDataService.Models.Query;
 using Prolog.Abstractions.CommonModels.DaDataService.Models.Response;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -56,6 +57,12 @@ public class DaDataHttpClient : IDisposable
         var jsonString = JsonSerializer.Serialize(query);
         var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
         var response = await _addressHttpClient.PostAsync("api/v1/clean/address", content);
+
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            Console.WriteLine(response.Content);
+        }
+
         var result = await response.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<IEnumerable<CoordinatesResponseModel>>(result)!.First();
     }
