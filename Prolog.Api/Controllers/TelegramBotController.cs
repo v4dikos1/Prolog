@@ -45,7 +45,7 @@ public class TelegramBotController(IPrologBotService prologBotService, ISender s
                     await prologBotService.SendOrdersAsync(update, cancellationToken);
                     return;
                 case BotCommands.Profile:
-                    await prologBotService.SendMessageAsync(update, "Профиль", cancellationToken);
+                    await prologBotService.GetProfileAsync(update, cancellationToken);
                     return;
             }
         }
