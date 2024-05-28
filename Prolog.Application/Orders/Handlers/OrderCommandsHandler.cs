@@ -158,7 +158,7 @@ internal class OrderCommandsHandler(ICurrentHttpContextAccessor contextAccessor,
             .Where(x => x.ExternalSystemId == externalSystemId)
             .Where(x => x.OrderStatus == OrderStatusEnum.Incoming)
             .Where(x => existingStoragesIds.Contains(x.StorageId))
-            .Where(x => startDate <= x.DeliveryDateFrom && endDate >= x.DeliveryDateTo)
+            .Where(x => startDate <= x.DeliveryDateFrom && startDate.AddDays(1) >= x.DeliveryDateFrom)
             .WhereIf(request.Body.OrderIds != null, x => request.Body.OrderIds!.Contains(x.Id))
             .ToListAsync(cancellationToken);
 
