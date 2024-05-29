@@ -69,7 +69,7 @@ try
             build =>
             {
                 build
-                    .WithOrigins("https://krsk-prolog.ru")
+                    .WithOrigins(builder.Configuration.GetSection("ClientUrl").Value!)
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();
