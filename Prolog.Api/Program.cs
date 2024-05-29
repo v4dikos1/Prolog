@@ -64,7 +64,7 @@ try
                     .AllowAnyMethod()
                     .WithExposedHeaders("*");
             });
-
+         
         options.AddPolicy("SignalR",
             build =>
             {
