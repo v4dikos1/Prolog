@@ -69,7 +69,7 @@ try
             build =>
             {
                 build
-                    .WithOrigins("http://localhost:3000")
+                    .WithOrigins("https://krsk-prolog.ru")
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();
