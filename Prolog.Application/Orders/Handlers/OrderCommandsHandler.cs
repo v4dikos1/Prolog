@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Prolog.Abstractions.CommonModels;
@@ -7,6 +8,7 @@ using Prolog.Abstractions.CommonModels.DaDataService.Models.Query;
 using Prolog.Abstractions.CommonModels.MapBoxService;
 using Prolog.Abstractions.Services;
 using Prolog.Application.Addresses.Mappers;
+using Prolog.Application.Hubs;
 using Prolog.Application.Orders.Commands;
 using Prolog.Application.Orders.Dtos;
 using Prolog.Core.EntityFramework.Extensions;
@@ -19,7 +21,8 @@ using System.Globalization;
 namespace Prolog.Application.Orders.Handlers;
 
 internal class OrderCommandsHandler(ICurrentHttpContextAccessor contextAccessor, ApplicationDbContext dbContext,
-    IExternalSystemService externalSystemService, IDaDataService daDataService, IAddressMapper addressMapper, IMapBoxService mapBoxService, ILogger<OrderCommandsHandler> logger):
+    IExternalSystemService externalSystemService, IDaDataService daDataService, IAddressMapper addressMapper, IMapBoxService mapBoxService, ILogger<OrderCommandsHandler> logger,
+    IHubContext<PrologHub, IPrologHub> hubContext):
     IRequestHandler<CreateOrderCommand, CreatedOrUpdatedEntityViewModel<long>>, IRequestHandler<PlanOrdersCommand>,
     IRequestHandler<RetrieveSolutionCommand>, IRequestHandler<CompleteOrderCommand>, IRequestHandler<ArchiveOrdersCommand>, IRequestHandler<CancelOrdersCommand>
 {
@@ -319,6 +322,8 @@ internal class OrderCommandsHandler(ICurrentHttpContextAccessor contextAccessor,
                 order.ProblemId = null;
             }
         }
+
+        await hubContext.Clients.All.OrdersPlanned();
 
         await dbContext.SaveChangesAsync(cancellationToken);
     }

@@ -8,6 +8,7 @@ using Prolog.Api.StartupConfigurations;
 using Prolog.Api.StartupConfigurations.Options;
 using Prolog.Api.StartupConfigurations.Swagger;
 using Prolog.Application;
+using Prolog.Application.Hubs;
 using Prolog.Domain;
 using Prolog.Infrastructure;
 using Prolog.Keycloak;
@@ -31,6 +32,8 @@ try
     builder.Services.AddHealthChecks();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
+
+    builder.Services.AddSignalR();
 
     builder.Services.RegisterDataAccessServices(builder.Configuration, builder.Environment.IsDevelopment());
     builder.Services.RegisterUseCasesServices();
@@ -61,6 +64,16 @@ try
                     .AllowAnyMethod()
                     .WithExposedHeaders("*");
             });
+
+        options.AddPolicy("SignalR",
+            build =>
+            {
+                build
+                    .WithOrigins("http://localhost:3000")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
+            });
     });
 
     var app = builder.Build();
@@ -82,6 +95,7 @@ try
 
     app.MapControllers();
     app.ListenBot();
+    app.MapHub<PrologHub>("/hub");
 
     app.Run();
 }
